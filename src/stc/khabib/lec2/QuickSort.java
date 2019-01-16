@@ -47,7 +47,7 @@ public class QuickSort extends Sorting {
     }
 
     //TODO: Переопределение статических методов
-    private static void sort(Integer[] arr) {
+    public static void sort(Integer[] arr) {
         quickSort(arr, 0, arr.length - 1);
     }
 

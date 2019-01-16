@@ -13,7 +13,6 @@ public class QuickSort extends Sorting {
      * @param arr Массив для сортировки
      */
     private static void insertionSort(Integer[] arr, int lo, int hi) {
-        // System.out.println("insertion: lo: " + lo + ", hi: " + hi);
         for (int i = lo; i < hi; i++) {
             Integer current = arr[i];
 
@@ -34,7 +33,6 @@ public class QuickSort extends Sorting {
      * @param hi  Номер последнего элемента сортируемой части
      */
     private static void quickSort(Integer[] arr, int lo, int hi) {
-        // System.out.println("quicksort: lo: " + lo + ", hi: " + hi);
         if (hi - lo <= CUTOFF) {
             insertionSort(arr, lo, hi + 1);
             return;
@@ -46,7 +44,11 @@ public class QuickSort extends Sorting {
         }
     }
 
-    //TODO: Переопределение статических методов
+    /**
+     * Публичный метод для выполнения быстрой сортировки
+     *
+     * @param arr Массив для сортировки
+     */
     public static void sort(Integer[] arr) {
         quickSort(arr, 0, arr.length - 1);
     }

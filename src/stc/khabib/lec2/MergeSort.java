@@ -43,9 +43,7 @@ public class MergeSort extends Sorting {
         Integer[] left = new Integer[leftSize];
         Integer[] right = new Integer[rightSize];
 
-        for (int i = 0; i < leftSize; i++) {
-            left[i] = arr[lo + i];
-        }
+        System.arraycopy(arr, lo, left, 0, leftSize);
 
         for (int i = 0; i < rightSize; i++) {
             right[i] = arr[mid + 1 + i];

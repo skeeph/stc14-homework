@@ -2,11 +2,21 @@ package stc.khabib.lec2;
 
 import java.util.Arrays;
 
+/**
+ * Сортировка слиянием
+ */
 public class MergeSort extends Sorting {
     public static void sort(Integer[] arr) {
         mergeSort(arr, 0, arr.length - 1);
     }
 
+    /**
+     * Выполняет сортировку части массива слиянием
+     *
+     * @param arr массив
+     * @param lo  левая граница сортируемой части
+     * @param hi  правая граница сортируемой части
+     */
     private static void mergeSort(Integer[] arr, int lo, int hi) {
         if (lo < hi) {
             int mid = (lo + hi) / 2;
@@ -16,6 +26,16 @@ public class MergeSort extends Sorting {
         }
     }
 
+    /**
+     * Операция слияния.
+     * Массивы для слияния передаются как часть массива arr.
+     * Левый массив имеет границы arr[lo:mid], правый arr[mid+1:hi]
+     *
+     * @param arr Массив
+     * @param lo  Левая граница рассматриваемой части массива
+     * @param mid Граница левого и правого массива
+     * @param hi  Правая граница рассматриваемой части массива
+     */
     private static void merge(Integer[] arr, int lo, int mid, int hi) {
         int leftSize = mid - lo + 1;
         int rightSize = hi - mid;
@@ -34,27 +54,11 @@ public class MergeSort extends Sorting {
 
         int i = 0, j = 0, k = lo;
         while (i < leftSize && j < rightSize) {
-            if (left[i] <= right[j]) {
-                arr[k] = left[i];
-                i++;
-            } else {
-                arr[k] = right[j];
-                j++;
-            }
-
-            k++;
+            arr[k++] = (left[i] <= right[j]) ? left[i++] : right[j++];
         }
 
-        while (i < leftSize) {
-            arr[k] = left[i];
-            i++;
-            k++;
-        }
-        while (j < rightSize) {
-            arr[k] = right[j];
-            j++;
-            k++;
-        }
+        while (i < leftSize) arr[k++] = left[i++];
+        while (j < rightSize) arr[k++] = right[j++];
 
     }
 

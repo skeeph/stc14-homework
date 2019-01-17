@@ -2,30 +2,31 @@ package stc.khabib.lec3;
 
 import java.util.*;
 
-public class MathBox extends ObjectBox {
-    private Set<Integer> store;
+public class MathBox<T extends Number> {
+    private Set<T> store;
 
-    public MathBox(Integer[] numbers) {
+    public MathBox(T[] numbers) {
         this.store = new TreeSet<>(Arrays.asList(numbers));
     }
 
-    public Integer summator() {
-        Integer sum = 0;
-        for (Integer i : this.store) {
-            sum += i;
+
+    public Double summator() {
+        Double sum = 0d;
+        for (T i : this.store) {
+            sum = sum + i.doubleValue();
         }
         return sum;
     }
 
-    public List<Integer> splitter(Integer divider) {
-        List<Integer> result = new ArrayList<>();
-        for (Integer i : this.store) {
-            result.add(i / divider);
+    public List<Double> splitter(T divider) {
+        List<Double> result = new ArrayList<>();
+        for (T i : this.store) {
+            result.add(i.doubleValue() / divider.doubleValue());
         }
         return result;
     }
 
-    public boolean remove(Integer element) {
+    public boolean remove(T element) {
         return this.store.remove(element);
     }
 
@@ -45,7 +46,7 @@ public class MathBox extends ObjectBox {
     @Override
     public String toString() {
         StringBuilder content = new StringBuilder();
-        for (Object element : this.store) {
+        for (T element : this.store) {
             content.append(element);
             content.append(", ");
         }

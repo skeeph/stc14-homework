@@ -24,7 +24,7 @@ public class FilesGenerator {
 
         for (int i = 1; i <= n; i++) {
             try (FileOutputStream fileOutputStream = new FileOutputStream(path + "/" + i + ".txt")) {
-                byte[] buf = null;
+                byte[] buf;
                 for (int j = 0; j < size; j++) {
                     buf = pg.getNextGenerated().getBytes();
                     fileOutputStream.write(buf);

@@ -26,7 +26,7 @@ public class ObjectBox<T> {
     }
 
     /**
-     * @return get internal collection
+     * @return getNextGenerated internal collection
      */
     protected Set<T> getStore() {
         return store;
@@ -70,6 +70,8 @@ public class ObjectBox<T> {
     public String toString() {
         return getClass().getSimpleName() + dump();
     }
+
+    // TODO: Обсудить с наставником реализацию equals и hashCode
 
     /**
      * Проверка равенства двух объектов

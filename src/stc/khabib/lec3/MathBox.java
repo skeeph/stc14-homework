@@ -7,6 +7,7 @@ import java.util.*;
  *
  * @param <T> Тип хранимых чисел
  */
+@SuppressWarnings("unused")
 public class MathBox<T extends Number> extends ObjectBox {
     private Set<T> store;
 
@@ -18,6 +19,7 @@ public class MathBox<T extends Number> extends ObjectBox {
      */
     public MathBox(T[] numbers) {
         checkInput(numbers);
+        this.hash = new Random().nextInt(100000) + Objects.hashCode(numbers);
         this.store = new TreeSet<>(Arrays.asList(numbers));
     }
 
@@ -42,12 +44,12 @@ public class MathBox<T extends Number> extends ObjectBox {
      *
      * @return Сумма элементов коллекции
      */
-    public T summator() {
-        Double sum = 0d;
+    public Double summator() {
+        double sum = 0d;
         for (T i : this.getStore()) {
             sum = sum + i.doubleValue();
         }
-        return (T) sum;
+        return sum;
     }
 
     /**

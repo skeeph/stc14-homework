@@ -1,17 +1,16 @@
 package stc.khabib.lec3;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class ObjectBox<T> {
+    protected int hash;
     private Set<T> store;
 
     /**
      * Constructor, creates ObjectBox with empty Collection
      */
     public ObjectBox() {
+        this.hash = new Random().nextInt(100000);
         this.store = new HashSet<>();
     }
 
@@ -21,6 +20,7 @@ public class ObjectBox<T> {
      * @param objects массив объектов
      */
     public ObjectBox(T[] objects) {
+        this.hash = new Random().nextInt(100000) + Objects.hashCode(objects);
         this.store = new HashSet<>();
         Collections.addAll(this.store, objects);
     }
@@ -79,19 +79,14 @@ public class ObjectBox<T> {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ObjectBox box = (ObjectBox) o;
-        return Objects.equals(this.getStore(), box.getStore());
+        return this == o;
     }
-
-    // TODO: hashcode не учитывает null
 
     /**
      * @return хеш-код объекта
      */
     @Override
     public int hashCode() {
-        return Objects.hash(this.getStore());
+        return hash;
     }
 }

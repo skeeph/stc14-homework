@@ -1,13 +1,13 @@
 package stc.khabib.lec05;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Resource {
+public class Resource implements AutoCloseable {
     /**
      * Регулярка, выбирает часть неоконченного предложения с конца строки.
      */
@@ -29,23 +29,33 @@ public class Resource {
     private String unfinishedSentence = "";
 
     private Set<String> targetWords;
+    private ResultStorage storage;
+    private BufferedReader reader;
 
-    public Resource(BufferedReader br, Set<String> targetWords) throws IOException {
+    public Resource(String path, Set<String> targetWords, ResultStorage storage) throws IOException {
         endSentencePattern = Pattern.compile(RE_END_SENTENCE);
         beginSentencePattern = Pattern.compile(RE_BEGIN_SENTENCE);
         sentencePattern = Pattern.compile(RE_SENTENCE, Pattern.MULTILINE);
 
         this.targetWords = targetWords;
-
-
-        String content;
-        while ((content = br.readLine()) != null) {
-            checkLine(content);
+        this.storage = storage;
+        InputStream is;
+        if (isURL(path)) {
+            is = new URL(path).openStream();
+        } else {
+            is = new FileInputStream(path);
         }
-
+        this.reader = new BufferedReader(new InputStreamReader(is));
     }
 
-    private void checkLine(String line) {
+    public void parseResource() throws IOException {
+        String content;
+        while ((content = this.reader.readLine()) != null) {
+            this.checkLine(content);
+        }
+    }
+
+    private void checkLine(String line) throws IOException {
         if (!unfinishedSentence.equals("")) {
             String[] continuations = findMatches(beginSentencePattern, line);
             if (continuations.length == 0) {
@@ -56,14 +66,14 @@ public class Resource {
             String continuation = continuations[0];
             String sentence = unfinishedSentence + " " + continuation;
             if (isMatch(sentence)) {
-                System.out.println("MATCH => " + sentence);
+                this.storage.writeSentence(sentence);
             }
             unfinishedSentence = "";
         }
 
         for (String matched : findMatches(sentencePattern, line)) {
             if (isMatch(matched)) {
-                System.out.println("MATCH => " + matched);
+                this.storage.writeSentence(matched);
             }
         }
 
@@ -78,7 +88,6 @@ public class Resource {
     }
 
     private Set<String> sentenceToWords(String sentence) {
-//        System.err.println(sentence);
         return Arrays.stream(
                 sentence.split("\\s+")
         )
@@ -98,5 +107,19 @@ public class Resource {
 
     private String removeTrailingPunctuation(String sentence) {
         return sentence.replaceAll("[^a-zA-Zа-яА-Я\\d\\s]", "");
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.reader.close();
+    }
+
+    private boolean isURL(String url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

@@ -6,9 +6,10 @@ public class OccurenciesTest {
         oc.getOccurencies(
                 new String[]{
                         "./generated/1.txt",
+                        "./generated/war.txt",
                         "https://www.ietf.org/rfc/rfc2616.txt"
                 },
-                new String[]{"эртугрул", "текфур", "canonical", "age"},
+                new String[]{"эртугрул", "текфур", "canonical", "age", "марию", "павловна"},
                 "found.txt"
         );
     }

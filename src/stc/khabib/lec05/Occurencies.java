@@ -1,9 +1,6 @@
 package stc.khabib.lec05;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Occurencies {
     Set<String> words;
@@ -12,13 +9,17 @@ public class Occurencies {
         this.words = new HashSet<>();
         this.words.addAll(Arrays.asList(words));
 
+        List<Thread> threads = new LinkedList<>();
+
         try (ResultStorage storage = new ResultStorage(res)) {
             for (String source : sources) {
-                try (Resource resource = new Resource(source, this.words, storage)) {
-                    resource.parseResource();
-                } catch (IOException e) {
-                    System.err.println("Ошибка открытия ресурса" + e);
-                }
+                Thread resource = new Resource(source, this.words, storage);
+                resource.start();
+                threads.add(resource);
+            }
+
+            for (Thread thread : threads) {
+                thread.join();
             }
         } catch (Exception e) {
             System.err.println("Ошибка работы с хранилищем результатов: " + e);

@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Resource implements AutoCloseable {
+public class Resource extends Thread {
     /**
      * Регулярка, выбирает часть неоконченного предложения с конца строки.
      */
@@ -43,23 +43,27 @@ public class Resource implements AutoCloseable {
         this.path = path;
     }
 
-    private void openResource() throws IOException {
-        if (this.reader == null) {
-            InputStream is;
-            if (isURL(path)) {
-                is = new URL(path).openStream();
-            } else {
-                is = new FileInputStream(path);
-            }
-            this.reader = new BufferedReader(new InputStreamReader(is));
+    private BufferedReader openResource() throws IOException {
+        InputStream is;
+        if (isURL(path)) {
+            is = new URL(path).openStream();
+        } else {
+            is = new FileInputStream(path);
         }
+        return new BufferedReader(new InputStreamReader(is));
+
     }
 
     public void parseResource() throws IOException {
-        openResource();
-        String content;
-        while ((content = this.reader.readLine()) != null) {
-            this.checkLine(content);
+        try (BufferedReader r = this.openResource()) {
+            this.reader = r;
+            String content;
+            while ((content = this.reader.readLine()) != null) {
+                this.checkLine(content);
+            }
+        } finally {
+            this.reader.close();
+            this.reader = null;
         }
         System.out.println("Умпешно обработан ресурс: " + this.path);
     }
@@ -118,17 +122,21 @@ public class Resource implements AutoCloseable {
         return sentence.replaceAll("[^a-zA-Zа-яА-Я\\d\\s]", "");
     }
 
-    @Override
-    public void close() throws Exception {
-        this.reader.close();
-    }
-
     private boolean isURL(String url) {
         try {
             new URL(url);
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            this.parseResource();
+        } catch (IOException e) {
+            System.err.printf("Ошибка парсинга ресурса %s: %s", this.path, e);
         }
     }
 }

@@ -31,28 +31,37 @@ public class Resource implements AutoCloseable {
     private Set<String> targetWords;
     private ResultStorage storage;
     private BufferedReader reader;
+    private String path;
 
-    public Resource(String path, Set<String> targetWords, ResultStorage storage) throws IOException {
+    public Resource(String path, Set<String> targetWords, ResultStorage storage) {
         endSentencePattern = Pattern.compile(RE_END_SENTENCE);
         beginSentencePattern = Pattern.compile(RE_BEGIN_SENTENCE);
         sentencePattern = Pattern.compile(RE_SENTENCE, Pattern.MULTILINE);
 
         this.targetWords = targetWords;
         this.storage = storage;
-        InputStream is;
-        if (isURL(path)) {
-            is = new URL(path).openStream();
-        } else {
-            is = new FileInputStream(path);
+        this.path = path;
+    }
+
+    private void openResource() throws IOException {
+        if (this.reader == null) {
+            InputStream is;
+            if (isURL(path)) {
+                is = new URL(path).openStream();
+            } else {
+                is = new FileInputStream(path);
+            }
+            this.reader = new BufferedReader(new InputStreamReader(is));
         }
-        this.reader = new BufferedReader(new InputStreamReader(is));
     }
 
     public void parseResource() throws IOException {
+        openResource();
         String content;
         while ((content = this.reader.readLine()) != null) {
             this.checkLine(content);
         }
+        System.out.println("Умпешно обработан ресурс: " + this.path);
     }
 
     private void checkLine(String line) throws IOException {

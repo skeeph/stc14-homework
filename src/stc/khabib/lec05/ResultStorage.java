@@ -16,9 +16,8 @@ public class ResultStorage implements AutoCloseable {
         this.storage = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path)));
     }
 
-    public void writeSentence(String sentence) throws IOException {
-        this.storage.write(sentence);
-        this.storage.newLine();
+    public synchronized void writeSentence(String sentence) throws IOException {
+        this.storage.write(sentence + "\n");
     }
 
     @Override

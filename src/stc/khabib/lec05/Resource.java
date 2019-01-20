@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Resource extends Thread {
+public class Resource implements Runnable {
     /**
      * Регулярка, выбирает часть неоконченного предложения с конца строки.
      */
@@ -55,17 +55,24 @@ public class Resource extends Thread {
     }
 
     public void parseResource() throws IOException {
+        long startTime = System.nanoTime();
         try (BufferedReader r = this.openResource()) {
             this.reader = r;
             String content;
+            int lineNum = 0;
             while ((content = this.reader.readLine()) != null) {
                 this.checkLine(content);
+                lineNum++;
+                if (lineNum % 100000 == 0) {
+                    System.err.println("====>" + this.path + " " + lineNum);
+                }
             }
         } finally {
             this.reader.close();
             this.reader = null;
         }
-        System.out.println("Умпешно обработан ресурс: " + this.path);
+        long elpsed = System.nanoTime() - startTime;
+        System.out.println("SUCCESS: " + this.path + ". Time: " + elpsed / 1000000 + " ms.");
     }
 
     private void checkLine(String line) throws IOException {

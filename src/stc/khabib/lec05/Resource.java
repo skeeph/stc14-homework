@@ -1,12 +1,16 @@
 package stc.khabib.lec05;
 
+import stc.khabib.lec05.storage.ResultStorage;
+
 import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
+/**
+ * Класс реализует задачу поиска предложений в тексте.
+ */
 public class Resource implements Runnable {
     /**
      * Регулярка, выбирает часть неоконченного предложения с конца строки.
@@ -23,9 +27,9 @@ public class Resource implements Runnable {
      */
     private static final String RE_SENTENCE = "[A-ZА-Я][^!?.]+[!?.]";
 
-    private final Pattern endSentencePattern;
-    private final Pattern beginSentencePattern;
-    private final Pattern sentencePattern;
+    private final Pattern endSentencePattern = Pattern.compile(RE_END_SENTENCE);
+    private final Pattern beginSentencePattern = Pattern.compile(RE_BEGIN_SENTENCE);
+    private final Pattern sentencePattern = Pattern.compile(RE_SENTENCE, Pattern.MULTILINE);
     private String unfinishedSentence = "";
 
     private Set<String> targetWords;
@@ -33,16 +37,23 @@ public class Resource implements Runnable {
     private BufferedReader reader;
     private String path;
 
+    /**
+     * @param path        Путь к ресурсу
+     * @param targetWords Слова, которые нужно искать в предложениях
+     * @param storage     хранилище результатов
+     */
     public Resource(String path, Set<String> targetWords, ResultStorage storage) {
-        endSentencePattern = Pattern.compile(RE_END_SENTENCE);
-        beginSentencePattern = Pattern.compile(RE_BEGIN_SENTENCE);
-        sentencePattern = Pattern.compile(RE_SENTENCE, Pattern.MULTILINE);
-
         this.targetWords = targetWords;
         this.storage = storage;
         this.path = path;
     }
 
+    /**
+     * Открытие ресурса
+     *
+     * @return объект для чтения из ресурса
+     * @throws IOException ошибка открытия
+     */
     private BufferedReader openResource() throws IOException {
         InputStream is;
         if (isURL(path)) {
@@ -54,6 +65,11 @@ public class Resource implements Runnable {
 
     }
 
+    /**
+     * Парсинг ресурса и поиск подходящих предлоежний
+     *
+     * @throws IOException Ошибка чтения
+     */
     public void parseResource() throws IOException {
         long startTime = System.nanoTime();
         try (BufferedReader r = this.openResource()) {
@@ -75,6 +91,15 @@ public class Resource implements Runnable {
         System.out.println("SUCCESS: " + this.path + ". Time: " + elpsed / 1000000 + " ms.");
     }
 
+    /**
+     * Проверка строки текста.
+     * <p>
+     * Функция ищет предложения в тексте, проверяет на совпадения слов и искомыми
+     * и записывает подходящие предложения в хранилище.
+     *
+     * @param line строка текста
+     * @throws IOException ошибка
+     */
     private void checkLine(String line) throws IOException {
         if (!unfinishedSentence.equals("")) {
             String[] continuations = findMatches(beginSentencePattern, line);
@@ -103,19 +128,35 @@ public class Resource implements Runnable {
         }
     }
 
+    /**
+     * Функция проверяет содержатся ли в данной предложении хоть одно из искомых слов
+     *
+     * @param sentence Предложение
+     * @return true если содержится
+     */
     private boolean isMatch(String sentence) {
         return !Collections.disjoint(sentenceToWords(sentence), targetWords);
     }
 
+    /**
+     * Разбивает предложение по словам, удаляет пунктуацию и переводит все в нижний регистр
+     *
+     * @param sentence предложение
+     * @return множество слов в предложении
+     */
     private Set<String> sentenceToWords(String sentence) {
-        return Arrays.stream(
-                sentence.split("\\s+")
-        )
-                .map(this::removeTrailingPunctuation)
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet());
+        Set<String> words = new HashSet<>();
+        Collections.addAll(words, removeTrailingPunctuation(sentence.toLowerCase()).split("\\s+"));
+        return words;
     }
 
+    /**
+     * Поиск совпадений в предложении по регулярке
+     *
+     * @param pattern регулярное выражения для поиска
+     * @param content текст
+     * @return массив совпадений
+     */
     private String[] findMatches(Pattern pattern, String content) {
         List<String> matches = new LinkedList<>();
         Matcher matcher = pattern.matcher(content);
@@ -125,10 +166,22 @@ public class Resource implements Runnable {
         return matches.toArray(new String[0]);
     }
 
+    /**
+     * Удаляет пунктуацию из строки
+     *
+     * @param sentence строка текста
+     * @return текста без пунктуации
+     */
     private String removeTrailingPunctuation(String sentence) {
         return sentence.replaceAll("[^a-zA-Zа-яА-Я\\d\\s]", "");
     }
 
+    /**
+     * Функция проверяет является ли адрес ресурса путем к файлу или удаленному ресурсу
+     *
+     * @param url адрес
+     * @return true - если адрес удаленного ресурса
+     */
     private boolean isURL(String url) {
         try {
             new URL(url);
@@ -138,6 +191,9 @@ public class Resource implements Runnable {
         }
     }
 
+    /**
+     * Запуск треда
+     */
     @Override
     public void run() {
         try {

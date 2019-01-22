@@ -1,8 +1,11 @@
 package stc.khabib.lec06_serde;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,13 +15,17 @@ public class Serializer {
             "Byte", "Short", "Integer", "Long", "Float", "Double", "Character", "Boolean", "String"
     ));
 
-    public void serialize(Object o, String path) throws IllegalAccessException {
+    public void serialize(Object o, String path) throws IllegalAccessException, IOException {
         String name = o.getClass().getCanonicalName();
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"className\": \"").append(name).append("\",");
-        String objectJson = serializeObject(o, 0);
-        sb.append("\"fields\":").append(objectJson).append("}");
+        sb.append("{\n").append(IDENT).append("\"className\": \"").append(name).append("\",");
+        String objectJson = serializeObject(o, 2);
+        sb.append("\n").append(IDENT).append("\"fields\":").append(objectJson).append("\n}");
         System.out.println(sb.toString());
+
+        try (FileOutputStream fs = new FileOutputStream(path)) {
+            fs.write(sb.toString().getBytes());
+        }
     }
 
     private String serializePrimitive(Object o) {
@@ -38,7 +45,7 @@ public class Serializer {
             return this.serializePrimitive(o);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("{");
+        sb.append("{\n");
 
         Field[] declaredFields = o.getClass().getDeclaredFields();
         for (int i = 0; i < declaredFields.length; i++) {
@@ -47,13 +54,13 @@ public class Serializer {
 
             StringBuilder fieldSb = new StringBuilder();
             Class fieldType = f.getType();
-            fieldSb.append("\"").append(f.getName()).append("\":");
+            fieldSb.append(getIdent(identLevel)).append("\"").append(f.getName()).append("\":");
 
             if (fieldType.isArray()) {
                 String arrayValue = serializeArray(o, f);
                 fieldSb.append(arrayValue);
             } else {
-                String objectValue = serializeObject(f.get(o), i + 1);
+                String objectValue = serializeObject(f.get(o), identLevel + 1);
                 fieldSb.append(objectValue);
             }
 
@@ -62,7 +69,7 @@ public class Serializer {
                 sb.append(",\n");
             }
         }
-        sb.append("}");
+        sb.append("\n}");
         return sb.toString();
     }
 
@@ -82,5 +89,8 @@ public class Serializer {
         return sb.toString();
     }
 
+    private String getIdent(int identLevel) {
+        return String.join("", Collections.nCopies(identLevel, IDENT));
+    }
 
 }

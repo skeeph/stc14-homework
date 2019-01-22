@@ -1,12 +1,18 @@
 package stc.khabib.lec06_serde;
 
+import java.util.Arrays;
+
 public class Human {
     String firstName, lastName;
     int age;
     double height, weight;
     private boolean gender;
-    private String[] nicks = new String[]{"this", "is", "some", "nick"};
+    private String[] nicks;
     private Human spouse;
+
+    public Human() {
+
+    }
 
     public Human(String firstName, String lastName, int age, double height, double weight, boolean gender, Human spouse) {
         this.firstName = firstName;
@@ -25,6 +31,7 @@ public class Human {
         this.height = height;
         this.weight = weight;
         this.gender = gender;
+        this.nicks = new String[]{"this", "is", "some", "nick"};
     }
 
     @Override
@@ -35,6 +42,13 @@ public class Human {
                 ", age=" + age +
                 ", height=" + height +
                 ", weight=" + weight +
+                ", gender=" + gender +
+                ", nicks=" + Arrays.toString(nicks) +
+                ", spouse=" + spouse +
                 '}';
+    }
+
+    public Human getSpouse() {
+        return spouse;
     }
 }

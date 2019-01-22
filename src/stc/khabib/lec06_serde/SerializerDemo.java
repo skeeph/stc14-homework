@@ -1,13 +1,15 @@
 package stc.khabib.lec06_serde;
 
-import java.io.IOException;
-
 public class SerializerDemo {
-    public static void main(String[] args) throws IllegalAccessException, IOException {
+    public static void main(String[] args) throws Exception {
         Human wife = new Human("Arven", "Undomiel", 2777, 1.95, 70, false);
         Human h = new Human("Aragorn", "Elessar", 87, 1.85, 70, true, wife);
-        Serializer sz = new Serializer();
-        sz.serialize(h, "./me.json");
+        Deserializer sz = new Deserializer();
+//        sz.serialize(h,"./me.json");
+
+        Human dessed = (Human) sz.deSerialize("./me.json");
+        System.out.println(dessed);
+        System.out.println(dessed.getSpouse());
     }
 
 }

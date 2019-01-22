@@ -54,7 +54,7 @@ public class Serializer {
 
             StringBuilder fieldSb = new StringBuilder();
             Class fieldType = f.getType();
-            fieldSb.append(getIdent(identLevel)).append("\"").append(f.getName()).append("\":");
+            fieldSb.append(getIdent(identLevel)).append("\"").append(f.getName()).append("\": ");
 
             if (fieldType.isArray()) {
                 String arrayValue = serializeArray(o, f);
@@ -93,4 +93,12 @@ public class Serializer {
         return String.join("", Collections.nCopies(identLevel, IDENT));
     }
 
+}
+
+
+class SerializationException extends Exception {
+
+    public SerializationException(String s) {
+        super(s);
+    }
 }

@@ -101,10 +101,6 @@ public class Deserializer {
         return createObject(new AbstractMap.SimpleEntry<String, String>(serializedClass, parsed.getValue()));
     }
 
-    private Object parseObject(String typeName, List<String> content) {
-        return null;
-    }
-
     private Object createObject(Map.Entry<String, String> serilizedData) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchFieldException {
         Object o = Serializer.class.getClassLoader().loadClass(serilizedData.getKey()).newInstance();
         Iterator<Map.Entry<String, String>> it = toTokens(serilizedData.getValue());
@@ -121,7 +117,6 @@ public class Deserializer {
         }
         return o;
     }
-
 
     private void setArray(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, IllegalAccessException {
         Field f = o.getClass().getDeclaredField(kv.getKey());

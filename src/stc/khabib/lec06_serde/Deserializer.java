@@ -65,7 +65,7 @@ public class Deserializer {
             content = reader.lines().collect(Collectors.joining("\n"));
         }
 
-        Iterator<Map.Entry<String, String>> it = toTokens(content);
+        Iterator<Map.Entry<String, String>> it = tokenize(content);
         Map<String, String> json = new HashMap<>();
 
         for (; it.hasNext(); ) {
@@ -82,12 +82,12 @@ public class Deserializer {
         if (fields == null) {
             throw new SerializationException("Empty `fields` in serialized");
         }
-        return createObject(new AbstractMap.SimpleEntry<>(className, fields));
+        return createObject(className, fields);
     }
 
-    private Object createObject(Map.Entry<String, String> serilizedData) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchFieldException {
-        Object o = Serializer.class.getClassLoader().loadClass(serilizedData.getKey()).newInstance();
-        Iterator<Map.Entry<String, String>> it = toTokens(serilizedData.getValue());
+    private Object createObject(String className, String fields) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+        Object o = Serializer.class.getClassLoader().loadClass(className).newInstance();
+        Iterator<Map.Entry<String, String>> it = tokenize(fields);
         while (it.hasNext()) {
             Map.Entry<String, String> next = it.next();
 
@@ -117,12 +117,8 @@ public class Deserializer {
     private void setObject(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException, InstantiationException {
         Field f = o.getClass().getDeclaredField(kv.getKey());
         f.setAccessible(true);
-
-        Object nested = createObject(
-                new AbstractMap.SimpleEntry<>(f.getType().getCanonicalName(), kv.getValue())
-        );
+        Object nested = createObject(f.getType().getCanonicalName(), kv.getValue());
         f.set(o, nested);
-
     }
 
     private void setValue(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, IllegalAccessException {
@@ -171,7 +167,7 @@ public class Deserializer {
         return value;
     }
 
-    private Iterator<Map.Entry<String, String>> toTokens(String content) {
+    private Iterator<Map.Entry<String, String>> tokenize(String content) {
         content = content.trim();
         content = content.substring(1, content.length() - 1);
         List<String> tokens = new LinkedList<>(Arrays.asList(content.split(",\\s")));
@@ -180,7 +176,7 @@ public class Deserializer {
         Iterator<String> it = tokens.iterator();
         while (it.hasNext()) {
             String token = it.next().trim();
-            String res = "";
+            String res;
             if (token.contains("{")) {
                 res = readObject(it, token);
             } else if (token.contains("[")) {

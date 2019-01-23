@@ -85,7 +85,7 @@ public class Deserializer {
         return createObject(className, fields);
     }
 
-    private Object createObject(String className, String fields) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+    private Object createObject(String className, String fields) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchFieldException, SerializationException {
         Object o = Serializer.class.getClassLoader().loadClass(className).newInstance();
         Iterator<Map.Entry<String, String>> it = tokenize(fields);
         while (it.hasNext()) {
@@ -114,7 +114,7 @@ public class Deserializer {
         f.set(o, array);
     }
 
-    private void setObject(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+    private void setObject(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException, InstantiationException, SerializationException {
         Field f = o.getClass().getDeclaredField(kv.getKey());
         f.setAccessible(true);
         Object nested = createObject(f.getType().getCanonicalName(), kv.getValue());
@@ -167,26 +167,8 @@ public class Deserializer {
         return value;
     }
 
-    private Iterator<Map.Entry<String, String>> tokenize(String content) {
-        content = content.trim();
-        content = content.substring(1, content.length() - 1);
-        List<String> tokens = new LinkedList<>(Arrays.asList(content.split(",\\s")));
-        List<Map.Entry<String, String>> result = new LinkedList<>();
-
-        Iterator<String> it = tokens.iterator();
-        while (it.hasNext()) {
-            String token = it.next().trim();
-            String res;
-            if (token.contains("{")) {
-                res = readObject(it, token);
-            } else if (token.contains("[")) {
-                res = readArray(it, token);
-            } else {
-                res = token;
-            }
-            result.add(parseToken(res.trim() + ", "));
-        }
-        return result.iterator();
+    private Iterator<Map.Entry<String, String>> tokenize(String content) throws SerializationException {
+        return JSONTokenizer.tokenize(content).entrySet().iterator();
     }
 
 }

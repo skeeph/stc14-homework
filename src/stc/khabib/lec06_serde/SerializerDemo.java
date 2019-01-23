@@ -9,7 +9,7 @@ public class SerializerDemo {
 
         Human dessed = (Human) sz.deSerialize("./me.json");
         System.out.println(dessed);
-        System.out.println(dessed.getSpouse());
+//        System.out.println(dessed.getSpouse());
     }
 
 }

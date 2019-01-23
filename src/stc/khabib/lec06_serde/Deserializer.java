@@ -35,10 +35,10 @@ public class Deserializer {
 
 
     private String readObject(Iterator<String> it, String begin) {
-        StringBuilder sb = new StringBuilder(begin).append(" ");
+        StringBuilder sb = new StringBuilder(begin).append(", ");
         int nestedCount = 1;
         while (it.hasNext()) {
-            String token = it.next();
+            String token = it.next().trim();
             if (token.equals("")) {
                 continue;
             }
@@ -59,46 +59,30 @@ public class Deserializer {
     }
 
     public Object deSerialize(String path) throws Exception {
-        List<String> content;
+        String content;
 
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(path))) {
-            content = reader.lines()
-                    .map(x -> x.replaceAll(":\\s+", ":"))
-                    .map(x -> x.split("\\s+"))
-                    .flatMap(Arrays::stream)
-                    .collect(Collectors.toList());
+            content = reader.lines().collect(Collectors.joining("\n"));
         }
-        Object o = null;
 
-        Iterator<String> it = content.iterator();
-        String res = "";
-        String serializedClass = null;
+        Iterator<Map.Entry<String, String>> it = toTokens(content);
+        Map<String, String> json = new HashMap<>();
 
-        while (it.hasNext()) {
-            String token = it.next();
-            if (token.equals("") || token.equals("{") || token.equals("}")) {
-                continue;
-            }
-
-            // Инициализация объекта
-            if (serializedClass == null) {
-                Map.Entry<String, String> parsedToken = parseToken(token);
-                if (!"className".equals(parsedToken.getKey())) {
-                    throw new SerializationException("in json file fist token must be className");
-                }
-                serializedClass = parsedToken.getValue();
-                continue;
-            }
-
-            if (token.contains("\"fields\":{")) {
-                res = readObject(it, token);
-                break;
-            } else {
-                throw new SerializationException("fields not found");
-            }
+        for (; it.hasNext(); ) {
+            Map.Entry<String, String> e = it.next();
+            json.put(e.getKey(), e.getValue());
         }
-        Map.Entry<String, String> parsed = parseToken(res);
-        return createObject(new AbstractMap.SimpleEntry<String, String>(serializedClass, parsed.getValue()));
+
+        String className = json.get("className");
+        if (className == null) {
+            throw new SerializationException("No `className` field found in json");
+        }
+
+        String fields = json.get("fields");
+        if (fields == null) {
+            throw new SerializationException("Empty `fields` in serialized");
+        }
+        return createObject(new AbstractMap.SimpleEntry<>(className, fields));
     }
 
     private Object createObject(Map.Entry<String, String> serilizedData) throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchFieldException {
@@ -107,9 +91,9 @@ public class Deserializer {
         while (it.hasNext()) {
             Map.Entry<String, String> next = it.next();
 
-            if (next.getValue().substring(0, 1).equals("{")) {
+            if (next.getValue().trim().substring(0, 1).equals("{")) {
                 setObject(o, next);
-            } else if (next.getValue().substring(0, 1).equals("[")) {
+            } else if (next.getValue().trim().substring(0, 1).equals("[")) {
                 setArray(o, next);
             } else {
                 setValue(o, next);
@@ -147,7 +131,7 @@ public class Deserializer {
         if (f.getType().isPrimitive()) {
             Object val = convertTo(kv.getValue(), f.getType());
             f.set(o, val);
-        } else if (kv.getValue().equals("null")) {
+        } else if (kv.getValue().trim().equals("null")) {
             f.set(o, null);
         } else {
             f.set(o, kv.getValue());
@@ -166,6 +150,7 @@ public class Deserializer {
     }
 
     private Object convertTo(String value, Class type) {
+        value = value.trim();
         if (type == long.class || type == Long.class)
             return Long.valueOf(value);
         if (type == int.class || type == Integer.class)
@@ -187,12 +172,14 @@ public class Deserializer {
     }
 
     private Iterator<Map.Entry<String, String>> toTokens(String content) {
-        List<String> tokens = new LinkedList<>(Arrays.asList(content.substring(1, content.length() - 1).split(", ")));
+        content = content.trim();
+        content = content.substring(1, content.length() - 1);
+        List<String> tokens = new LinkedList<>(Arrays.asList(content.split(",\\s")));
         List<Map.Entry<String, String>> result = new LinkedList<>();
 
         Iterator<String> it = tokens.iterator();
         while (it.hasNext()) {
-            String token = it.next();
+            String token = it.next().trim();
             String res = "";
             if (token.contains("{")) {
                 res = readObject(it, token);
@@ -201,7 +188,7 @@ public class Deserializer {
             } else {
                 res = token;
             }
-            result.add(parseToken(res + ", "));
+            result.add(parseToken(res.trim() + ", "));
         }
         return result.iterator();
     }

@@ -82,10 +82,10 @@ public class InMemoryJavaFileManager extends ForwardingJavaFileManager {
         }
 
         @Override
-        public OutputStream openOutputStream() throws IOException {
+        public OutputStream openOutputStream() {
             return new FilterOutputStream(new ByteArrayOutputStream()) {
                 @Override
-                public void close() throws IOException {
+                public void close() {
                     ByteArrayOutputStream bos = (ByteArrayOutputStream) out;
                     classBytes.put(name, bos.toByteArray());
                 }

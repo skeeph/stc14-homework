@@ -66,9 +66,8 @@ public class InMemoryCompiler {
 
     public Map<String, byte[]> compile(String fileName, String source) throws IOException {
         return compile(fileName, source, new PrintWriter(System.err),
-//                System.getProperty("user.dir"),
-//                System.getProperty("java.class.path")
-                null, null
+                System.getProperty("user.dir"),
+                System.getProperty("java.class.path")
         );
     }
 

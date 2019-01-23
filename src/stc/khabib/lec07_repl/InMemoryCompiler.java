@@ -4,7 +4,6 @@ import javax.tools.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +20,17 @@ public class InMemoryCompiler {
         stdFileManager = this.compiler.getStandardFileManager(null, null, null);
     }
 
-    private Map<String, byte[]> compile(final List<JavaFileObject> units,
-                                        final InMemoryJavaFileManager fileManager,
-                                        Writer err, String sourcePath, String classPath)
-            throws IOException {
+
+    private Map<String, byte[]> compile(String fileName, String source,
+                                        Writer err, String sourcePath, String classPath) throws IOException {
+        InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(stdFileManager);
+        List<JavaFileObject> compUnits = new ArrayList<>(1);
+        compUnits.add(fileManager.makeStringSource(fileName, source));
+
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
-
         // Опции Java компилятора
-        List<String> options = new ArrayList<String>();
+        List<String> options = new ArrayList<>();
 
 
         if (sourcePath != null) {
@@ -45,7 +46,7 @@ public class InMemoryCompiler {
 
         //Компиляция
         JavaCompiler.CompilationTask task = compiler.getTask(
-                err, fileManager, diagnostics, options, null, units
+                err, fileManager, diagnostics, options, null, compUnits
         );
 
         // Если произошла ошибка компиляции
@@ -53,6 +54,7 @@ public class InMemoryCompiler {
             for (Diagnostic diagnostic : diagnostics.getDiagnostics()) {
                 err.write(diagnostic.toString() + "\n");
             }
+            err.flush();
             return null;
         }
 
@@ -60,35 +62,14 @@ public class InMemoryCompiler {
         Map<String, byte[]> classBytes = fileManager.getClassBytes();
         fileManager.close();
         return classBytes;
-
-    }
-
-
-    private Map<String, byte[]> compile(String fileName, String source,
-                                        Writer err, String sourcePath, String classPath) throws IOException {
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(stdFileManager);
-        List<JavaFileObject> compUnits = new ArrayList<JavaFileObject>(1);
-        compUnits.add(fileManager.makeStringSource(fileName, source));
-        return compile(compUnits, fileManager, err, sourcePath, classPath);
     }
 
     public Map<String, byte[]> compile(String fileName, String source) throws IOException {
-        return compile(fileName, source, new PrintWriter(System.err), null, null);
-    }
-
-    public Method compileStaticMethod(String methodName, String className, String source) throws IOException, ClassNotFoundException {
-        Map<String, byte[]> classBytes = compile(className + ".java", source);
-        InMemoryClassLoader classLoader = new InMemoryClassLoader(classBytes);
-        Class clazz = classLoader.loadClass(className);
-        final Method[] methods = clazz.getDeclaredMethods();
-        for (final Method method : methods) {
-            if (method.getName().equals(methodName)) {
-                if (!method.isAccessible()) method.setAccessible(true);
-                return method;
-            }
-        }
-        throw new NoSuchMethodError(methodName);
+        return compile(fileName, source, new PrintWriter(System.err),
+//                System.getProperty("user.dir"),
+//                System.getProperty("java.class.path")
+                null, null
+        );
     }
 
 }

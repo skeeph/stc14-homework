@@ -1,6 +1,7 @@
 package stc.khabib.lec07_repl;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class ReplDemo {
     /**
@@ -8,11 +9,23 @@ public class ReplDemo {
      */
     public static void main(String[] args) throws Exception {
         InMemoryCompiler compiler = new InMemoryCompiler();
-        String source = "public final class Solution {\n"
-                + "public static String greeting(String name) {\n"
-                + "\treturn \"Hello \" + name;\n" + "}\n}\n";
-        Method greeting = compiler.compileStaticMethod("greeting", "Solution", source);
-        System.out.println(greeting.invoke(null, "lorem"));
+        String source = "public class Solution {\n"
+                + "public void doWork(String a, String b) {\n"
+                + "System.out.println(\"This is interface sample\");\n" +
+                "        System.out.println(a);\n" +
+                "        System.out.println(b);" +
+                "}\n}\n";
+
+        String className = "Solution";
+        Map<String, byte[]> classBytes = compiler.compile(className + ".java", source);
+        InMemoryClassLoader classLoader = new InMemoryClassLoader(classBytes);
+        Class clazz = classLoader.loadClass(className);
+
+        Object o = clazz.newInstance();
+        Method meth = clazz.getDeclaredMethod("doWork", String.class, String.class);
+        meth.invoke(o, "a", "b");
+//        Worker w = (Worker)o;
+//        w.doWork("Ты", "Труп");
     }
 }
 

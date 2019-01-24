@@ -9,12 +9,26 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Сериализатор объектов
+ */
 public class Serializer {
+    /**
+     * Отступ в json для создания форматированных файлов с результатами сериализации
+     */
     private static final String IDENT = "   ";
     private final Set<String> primitiveWrappers = new HashSet<>(Arrays.asList(
             "Byte", "Short", "Integer", "Long", "Float", "Double", "Character", "Boolean", "String"
     ));
 
+    /**
+     * Сериализация объекта и запись в файл
+     *
+     * @param o    объект для сериализации
+     * @param path путь к файлу для записи результатов
+     * @throws IllegalAccessException ошибка доступа к полям объекта
+     * @throws IOException            ошибка записи результатов
+     */
     public void serialize(Object o, String path) throws IllegalAccessException, IOException {
         String name = o.getClass().getCanonicalName();
         StringBuilder sb = new StringBuilder();
@@ -28,6 +42,12 @@ public class Serializer {
         }
     }
 
+    /**
+     * Сериализация значений примитивного типа
+     *
+     * @param o объект для сериализации
+     * @return строковое представление объекта
+     */
     private String serializePrimitive(Object o) {
         String res = o.toString();
         if (o instanceof String) {
@@ -36,6 +56,14 @@ public class Serializer {
         return res;
     }
 
+    /**
+     * Сериализация вложенного объекта
+     *
+     * @param o          объект для сериализации
+     * @param identLevel уровень вложенности
+     * @return сериализованный объект
+     * @throws IllegalAccessException ошибка доступа к полям объекта
+     */
     private String serializeObject(Object o, int identLevel) throws IllegalAccessException {
         if (o == null) {
             return "null";
@@ -73,6 +101,14 @@ public class Serializer {
         return sb.toString();
     }
 
+    /**
+     * Сериализация массива
+     *
+     * @param o     объект для сериализации
+     * @param array поле объекта - массив
+     * @return сериализованный массив
+     * @throws IllegalAccessException ошибка доступа к полям
+     */
     private String serializeArray(Object o, Field array) throws IllegalAccessException {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
@@ -89,6 +125,12 @@ public class Serializer {
         return sb.toString();
     }
 
+    /**
+     * Получение отступа в json-файле.
+     *
+     * @param identLevel уровень вложенности
+     * @return строка-отступ
+     */
     private String getIdent(int identLevel) {
         return String.join("", Collections.nCopies(identLevel, IDENT));
     }
@@ -96,9 +138,3 @@ public class Serializer {
 }
 
 
-class SerializationException extends Exception {
-
-    public SerializationException(String s) {
-        super(s);
-    }
-}

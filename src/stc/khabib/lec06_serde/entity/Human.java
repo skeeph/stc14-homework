@@ -1,4 +1,4 @@
-package stc.khabib.lec06_serde;
+package stc.khabib.lec06_serde.entity;
 
 import java.util.Arrays;
 

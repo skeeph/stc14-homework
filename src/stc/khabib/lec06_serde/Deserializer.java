@@ -1,64 +1,35 @@
 package stc.khabib.lec06_serde;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Класс - десериализатор
+ */
 public class Deserializer {
-    private static String TRAILINIG_REMOVER = "(^\\s*\")|([\"\\s,]*$)";
 
     public Deserializer() {
     }
 
 
-    private String readArray(Iterator<String> it, String begin) {
-        StringBuilder sb = new StringBuilder(begin).append(", ");
-        int arrayCount = 1;
-        while (it.hasNext()) {
-            String token = it.next();
-            sb.append(token).append(", ");
-            if (token.contains("[")) {
-                arrayCount++;
-            } else if (token.contains("]")) {
-                arrayCount--;
-                if (arrayCount == 0) {
-                    break;
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-
-    private String readObject(Iterator<String> it, String begin) {
-        StringBuilder sb = new StringBuilder(begin).append(", ");
-        int nestedCount = 1;
-        while (it.hasNext()) {
-            String token = it.next().trim();
-            if (token.equals("")) {
-                continue;
-            }
-            if (token.charAt(token.length() - 1) == ',') {
-                token = token.substring(0, token.length() - 1);
-            }
-            sb.append(token).append(", ");
-            if (token.contains("{")) {
-                nestedCount++;
-            } else if (token.contains("}")) {
-                nestedCount--;
-                if (nestedCount == 0) {
-                    break;
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-    public Object deSerialize(String path) throws Exception {
+    /**
+     * Функци читает json из файла, и десериалузет из него объект
+     *
+     * @param path Путь к json - файлу
+     * @return Десериализованный объект
+     * @throws InvalidJsonException   вызывается ошибками в формате json- файла
+     * @throws IOException            ошибка чтения файла
+     * @throws ClassNotFoundException не найден класс, объект которого сериализован в файле
+     */
+    public Object deSerialize(String path) throws InvalidJsonException, IOException, ClassNotFoundException, NoSuchFieldException, InstantiationException, IllegalAccessException {
         String content;
 
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(path))) {
@@ -75,17 +46,29 @@ public class Deserializer {
 
         String className = json.get("className");
         if (className == null) {
-            throw new SerializationException("No `className` field found in json");
+            throw new InvalidJsonException("No `className` field found in json");
         }
 
         String fields = json.get("fields");
         if (fields == null) {
-            throw new SerializationException("Empty `fields` in serialized");
+            throw new InvalidJsonException("Empty `fields` in serialized");
         }
         return createObject(className, fields);
     }
 
-    private Object createObject(String className, String fields) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchFieldException, SerializationException {
+    /**
+     * Функция создает объект класса className, и десериализует его поля из json строки fields
+     *
+     * @param className имя класса для создания объекта
+     * @param fields    строка с сериализованными полями объекта
+     * @return новый объект
+     * @throws ClassNotFoundException не найден класс, объект которого сериализован в файле
+     * @throws InstantiationException произошла ошибка создания объекта
+     * @throws IllegalAccessException ошибка доступа к полям объекта
+     * @throws NoSuchFieldException   попытка доступа к несуществующему полю класса
+     * @throws InvalidJsonException   ошибка в формате сериализованных данных
+     */
+    private Object createObject(String className, String fields) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchFieldException, InvalidJsonException {
         Object o = Serializer.class.getClassLoader().loadClass(className).newInstance();
         Iterator<Map.Entry<String, String>> it = tokenize(fields);
         while (it.hasNext()) {
@@ -102,6 +85,14 @@ public class Deserializer {
         return o;
     }
 
+    /**
+     * Десериализация массива и присвавание соответствующему полю объекта
+     *
+     * @param o  объект
+     * @param kv пара {имя поля}:{сериализованный метод}
+     * @throws NoSuchFieldException   попытка доступа к несуществующему полю
+     * @throws IllegalAccessException ошибка доступа к полю
+     */
     private void setArray(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, IllegalAccessException {
         Field f = o.getClass().getDeclaredField(kv.getKey());
         f.setAccessible(true);
@@ -114,13 +105,32 @@ public class Deserializer {
         f.set(o, array);
     }
 
-    private void setObject(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException, InstantiationException, SerializationException {
+    /**
+     * Десериализация вложенных объектов, и присваивание их соответствующему полю
+     *
+     * @param o  объект
+     * @param kv пара {имя поля}:{сериализованный json-объект}
+     * @throws NoSuchFieldException   попытка доступа к несуществующему полю
+     * @throws ClassNotFoundException не найден класс, экземпляром которого является поле-объект
+     * @throws IllegalAccessException ошибка доступа к полю
+     * @throws InstantiationException ошибка создания объекта
+     * @throws InvalidJsonException   неверный формат сериализованных данных
+     */
+    private void setObject(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvalidJsonException {
         Field f = o.getClass().getDeclaredField(kv.getKey());
         f.setAccessible(true);
         Object nested = createObject(f.getType().getCanonicalName(), kv.getValue());
         f.set(o, nested);
     }
 
+    /**
+     * Установка значений полю объекта
+     *
+     * @param o  объект
+     * @param kv пара {имя поля}:{значение поля}
+     * @throws NoSuchFieldException   поле не найдено
+     * @throws IllegalAccessException ошибка доступа к полю
+     */
     private void setValue(Object o, Map.Entry<String, String> kv) throws NoSuchFieldException, IllegalAccessException {
         Field f = o.getClass().getDeclaredField(kv.getKey());
         f.setAccessible(true);
@@ -134,17 +144,13 @@ public class Deserializer {
         }
     }
 
-    private Map.Entry<String, String> parseToken(String token) {
-        String[] kv = new String[2];
-        int index = token.indexOf(":");
-        kv[0] = token.substring(0, index);
-        kv[1] = token.substring(index + 1);
-        kv = Arrays.stream(kv)
-                .map(x -> x.replaceAll(TRAILINIG_REMOVER, ""))
-                .toArray(String[]::new);
-        return new AbstractMap.SimpleEntry<>(kv[0], kv[1]);
-    }
-
+    /**
+     * Парсит значени поля из строки, в тип поля, которому его нужно присвоить
+     *
+     * @param value строка с значением
+     * @param type  тип в который нужно превратить эту строку
+     * @return значение в необходимом типе
+     */
     private Object convertTo(String value, Class type) {
         value = value.trim();
         if (type == long.class || type == Long.class)
@@ -167,7 +173,15 @@ public class Deserializer {
         return value;
     }
 
-    private Iterator<Map.Entry<String, String>> tokenize(String content) throws SerializationException {
+    /**
+     * Функция парсит json строку и возвращает итератор по парам ключ:значение верхнего уровня.
+     * Вложенные массивы и объекты возвращаются в виде json строки
+     *
+     * @param content строка с сериализованным объектом
+     * @return итератор по парам ключ:значение верхнего уровня.
+     * @throws InvalidJsonException ошибка в сериализованных данных
+     */
+    private Iterator<Map.Entry<String, String>> tokenize(String content) throws InvalidJsonException {
         return JSONTokenizer.tokenize(content).entrySet().iterator();
     }
 

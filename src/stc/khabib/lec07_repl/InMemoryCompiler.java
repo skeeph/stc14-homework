@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Класс компилирует java код в райнтайме
+ */
 public class InMemoryCompiler {
     private JavaCompiler compiler;
     private StandardJavaFileManager stdFileManager;
@@ -21,8 +24,10 @@ public class InMemoryCompiler {
     }
 
 
-    private Map<String, byte[]> compile(String fileName, String source,
-                                        Writer err, String sourcePath, String classPath) throws IOException {
+    public Map<String, byte[]> compile(String fileName, String source) throws IOException {
+        Writer err = new PrintWriter(System.err);
+        // Используем кастомный менеджер файлов для записи результатов компиляции
+        // в какую то переменную, вместо записи на файл
         InMemoryJavaFileManager fileManager = new InMemoryJavaFileManager(stdFileManager);
         List<JavaFileObject> compUnits = new ArrayList<>(1);
         compUnits.add(fileManager.makeStringSource(fileName, source));
@@ -31,17 +36,10 @@ public class InMemoryCompiler {
 
         // Опции Java компилятора
         List<String> options = new ArrayList<>();
-
-
-        if (sourcePath != null) {
-            options.add("-sourcepath");
-            options.add(sourcePath);
-        }
-
-        if (classPath != null) {
-            options.add("-classpath");
-            options.add(classPath);
-        }
+        options.add("-sourcepath");
+        options.add(System.getProperty("user.dir"));
+        options.add("-classpath");
+        options.add(System.getProperty("java.class.path"));
 
 
         //Компиляция
@@ -63,12 +61,4 @@ public class InMemoryCompiler {
         fileManager.close();
         return classBytes;
     }
-
-    public Map<String, byte[]> compile(String fileName, String source) throws IOException {
-        return compile(fileName, source, new PrintWriter(System.err),
-                System.getProperty("user.dir"),
-                System.getProperty("java.class.path")
-        );
-    }
-
 }

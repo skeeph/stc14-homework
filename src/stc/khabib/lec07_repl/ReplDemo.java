@@ -1,5 +1,8 @@
 package stc.khabib.lec07_repl;
 
+/**
+ * Демонстрация работы
+ */
 public class ReplDemo {
     public static void main(String[] args) {
         Repl repl = new Repl();

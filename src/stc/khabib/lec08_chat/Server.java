@@ -61,18 +61,18 @@ class MainThread extends Thread {
                 out.flush(); // выталкиваем все из буфера
                 client.setSoTimeout(1000);
 
-                this.server.addUser(client, nick);
-//                while (true) {
-//                    try {
-//                        word = in.readLine();
-//                    } catch (SocketTimeoutException e) {
-//                        continue;
-//                    }
-//                    System.out.println(word);
-//                    String msg = String.format("<%s>: %s\n", nick, word);
-//                    out.write(msg);
-//                    out.flush(); // выталкиваем все из буфера
-//                }
+//                this.server.addUser(client, nick);
+                while (true) {
+                    try {
+                        word = in.readLine();
+                    } catch (SocketTimeoutException e) {
+                        continue;
+                    }
+                    System.out.println(word);
+                    String msg = String.format("<%s>: %s\n", nick, word);
+                    out.write(msg);
+                    out.flush(); // выталкиваем все из буфера
+                }
 
             } catch (SocketTimeoutException ignored) {
             } catch (IOException e) {

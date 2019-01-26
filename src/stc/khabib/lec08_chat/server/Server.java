@@ -1,4 +1,4 @@
-package stc.khabib.lec08_chat;
+package stc.khabib.lec08_chat.server;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-    private final Map<Socket, String> users;
+    private final Map<String, ClientListener> users;
     ServerSocket serverSocket;
     ExecutorService es;
 
@@ -34,8 +34,26 @@ public class Server {
         mainThread.join();
     }
 
-    public void addUser(Socket socket, String name) {
-        this.users.put(socket, name);
+    public void addUser(String name, ClientListener client) {
+        this.users.put(name, client);
+    }
+
+    public void sendMessageFromUser(String userName, String message) throws IOException {
+        message = String.format("<%s>: %s", userName, message);
+        for (Map.Entry<String, ClientListener> user : users.entrySet()) {
+            user.getValue().sendMessage(message);
+        }
+    }
+
+    public void sendServerMessage(String message) throws IOException {
+        message = String.format("*** %s ***", message);
+        for (Map.Entry<String, ClientListener> user : users.entrySet()) {
+            user.getValue().sendMessage(message);
+        }
+    }
+
+    public void removeUser(String userName) {
+        this.users.remove(userName);
     }
 }
 
@@ -50,8 +68,8 @@ class MainThread extends Thread {
     public void run() {
         System.out.println("Сервер запущен");
         while (!isInterrupted()) {
-            try (Socket client = this.server.serverSocket.accept()) {
-                String word;
+            try {
+                Socket client = this.server.serverSocket.accept();
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
 
@@ -59,22 +77,12 @@ class MainThread extends Thread {
                 System.out.println(nick);
                 out.write("Добро пожаловать в чат: " + nick + "\n");
                 out.flush(); // выталкиваем все из буфера
-                client.setSoTimeout(1000);
-
-//                this.server.addUser(client, nick);
-                while (true) {
-                    try {
-                        word = in.readLine();
-                    } catch (SocketTimeoutException e) {
-                        continue;
-                    }
-                    System.out.println(word);
-                    String msg = String.format("<%s>: %s\n", nick, word);
-                    out.write(msg);
-                    out.flush(); // выталкиваем все из буфера
-                }
-
+//                client.setSoTimeout(1000);
+                ClientListener user = new ClientListener(client, server, nick, in, out);
+                user.start();
+                this.server.addUser(nick, user);
             } catch (SocketTimeoutException ignored) {
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -38,14 +38,15 @@ public class Client {
             }
             clientReader.interrupt();
             clientReader.join();
+//            clientSocket.close();
             System.out.println("You typed `bye`, shutting down");
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally { // в любом случае необходимо закрыть сокет и потоки
             System.out.println("Клиент был закрыт...");
-            clientSocket.close();
             socketIn.close();
             out.close();
+            clientSocket.close();
         }
 
 

@@ -1,30 +1,39 @@
 package stc.khabib.lec08_chat.server;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
     private final Map<String, ClientListener> users;
+    public Queue<ClientListener> usersListeners;
     ServerSocket serverSocket;
-    ExecutorService es;
 
     public Server() throws IOException {
         serverSocket = new ServerSocket(4004);
         serverSocket.setSoTimeout(1000);
-        es = Executors.newCachedThreadPool();
         users = new ConcurrentHashMap<>();
+        usersListeners = new LinkedBlockingQueue<>();
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
         Server srv = new Server();
         Thread mainThread = new MainThread(srv);
         mainThread.start();
+        mainThread.setName("Main thread");
+        Thread reder = new ReaderThread(srv);
+        reder.start();
+        reder.setName("Reader thread 1");
+
+        Thread reder2 = new ReaderThread(srv);
+        reder2.start();
+        reder2.setName("Reader thread 2");
+
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String serverInput;
         while (!(serverInput = stdIn.readLine().trim()).equals("bye")) {
@@ -32,10 +41,17 @@ public class Server {
         }
         mainThread.interrupt();
         mainThread.join();
+
+        reder.interrupt();
+        reder.join();
+
+        reder2.interrupt();
+        reder2.join();
     }
 
     public void addUser(String name, ClientListener client) {
         this.users.put(name, client);
+        this.usersListeners.add(client);
     }
 
     public void sendMessageFromUser(String userName, String message) throws IOException {
@@ -54,40 +70,5 @@ public class Server {
 
     public void removeUser(String userName) {
         this.users.remove(userName);
-    }
-}
-
-class MainThread extends Thread {
-    private Server server;
-
-    public MainThread(Server s) {
-        this.server = s;
-    }
-
-    @Override
-    public void run() {
-        System.out.println("Сервер запущен");
-        while (!isInterrupted()) {
-            try {
-                Socket client = this.server.serverSocket.accept();
-                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-
-                String nick = in.readLine();
-                System.out.println(nick);
-                out.write("Добро пожаловать в чат: " + nick + "\n");
-                out.flush(); // выталкиваем все из буфера
-//                client.setSoTimeout(1000);
-                ClientListener user = new ClientListener(client, server, nick, in, out);
-                user.start();
-                this.server.addUser(nick, user);
-            } catch (SocketTimeoutException ignored) {
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("Server shutdown");
-
     }
 }

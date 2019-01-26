@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
     private final Map<String, ClientListener> users;
     public Queue<ClientListener> usersListeners;
     ServerSocket serverSocket;
+    ExecutorService loginService;
     private List<Thread> readerThread;
 
     public Server() throws IOException {
@@ -23,6 +26,7 @@ public class Server {
         users = new ConcurrentHashMap<>();
         usersListeners = new LinkedBlockingQueue<>();
         readerThread = new LinkedList<>();
+        loginService = Executors.newCachedThreadPool();
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -37,6 +41,7 @@ public class Server {
         while (!(serverInput = stdIn.readLine().trim()).equals("bye")) {
             System.out.println("Server printed: " + serverInput);
         }
+        srv.sendServerMessage("Server is shutting down");
         srv.stopReaderThreads();
         mainThread.interrupt();
         mainThread.join();

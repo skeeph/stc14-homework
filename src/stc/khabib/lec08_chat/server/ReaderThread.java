@@ -12,13 +12,14 @@ public class ReaderThread extends Thread {
 
     @Override
     public void run() {
+        System.out.println("Reader is run: " + this.getName());
         while (!isInterrupted()) {
             ClientListener cl = this.server.usersListeners.poll();
             if (cl == null) {
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException ignored) {
+                    this.interrupt();
                 }
                 continue;
             }
@@ -47,5 +48,6 @@ public class ReaderThread extends Thread {
                 }
             }
         }
+        System.out.println("Reader stopped : " + this.getName());
     }
 }

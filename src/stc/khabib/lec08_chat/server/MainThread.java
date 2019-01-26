@@ -17,7 +17,6 @@ class MainThread extends Thread {
         while (!isInterrupted()) {
             try {
                 Socket client = this.server.serverSocket.accept();
-//                client.setSoTimeout(500);
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
 

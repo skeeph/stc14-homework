@@ -2,11 +2,16 @@ package stc.khabib.lec09_streams;
 
 import stc.khabib.lec05.storage.ResultStorage;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Класс реализует задачу поиска предложений в тексте.
@@ -35,7 +40,6 @@ public class Resource implements Runnable {
 
     private Set<String> targetWords;
     private ResultStorage storage;
-    private BufferedReader reader;
     private String path;
 
     /**
@@ -55,14 +59,14 @@ public class Resource implements Runnable {
      * @return объект для чтения из ресурса
      * @throws IOException ошибка открытия
      */
-    private BufferedReader openResource() throws IOException {
-        InputStream is;
+    private Stream<String> openResourceStream() throws IOException {
         if (isURL(path)) {
-            is = new URL(path).openStream();
+            return new BufferedReader(
+                    new InputStreamReader(new URL(path).openStream())
+            ).lines();
         } else {
-            is = new FileInputStream(path);
+            return Files.lines(Paths.get(this.path));
         }
-        return new BufferedReader(new InputStreamReader(is));
 
     }
 
@@ -73,60 +77,50 @@ public class Resource implements Runnable {
      */
     public void parseResource() throws IOException {
         long startTime = System.nanoTime();
-        try (BufferedReader r = this.openResource()) {
-            this.reader = r;
-            String content;
-            int lineNum = 0;
-            while ((content = this.reader.readLine()) != null) {
-                this.checkLine(content);
-                lineNum++;
-                if (lineNum % 100000 == 0) {
-                    System.err.println("====>" + this.path + " " + lineNum);
+        try (Stream<String> r = this.openResourceStream()) {
+            Stream<String> collected = r.map(String::trim)
+                    .map(this::checkLine)
+                    .flatMap(Arrays::stream);
+            collected.reduce("", (a, b) -> {
+                String c = (a + " " + b).trim();
+                if (sentencePattern.matcher(c).matches()) {
+                    if (isMatch(c)) {
+                        try {
+                            this.storage.writeSentence(c);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return "";
                 }
-            }
-        } finally {
-            this.reader.close();
-            this.reader = null;
+                return c;
+            });
         }
         long elpsed = System.nanoTime() - startTime;
         System.out.println("SUCCESS: " + this.path + ". Time: " + elpsed / 1000000 + " ms.");
     }
 
-    /**
-     * Проверка строки текста.
-     * <p>
-     * Функция ищет предложения в тексте, проверяет на совпадения слов и искомыми
-     * и записывает подходящие предложения в хранилище.
-     *
-     * @param line строка текста
-     * @throws IOException ошибка
-     */
-    private void checkLine(String line) throws IOException {
-        if (!unfinishedSentence.equals("")) {
-            String[] continuations = findMatches(beginSentencePattern, line);
-            if (continuations.length == 0) {
-                unfinishedSentence += line;
-                return;
-            }
-
-            String continuation = continuations[0];
-            String sentence = unfinishedSentence + " " + continuation;
-            if (isMatch(sentence)) {
-                this.storage.writeSentence(sentence);
-            }
-            unfinishedSentence = "";
+    private String[] checkLine(String line) {
+        List<String> unfinished = new LinkedList<>();
+        List<String> begin = this.findMatches(beginSentencePattern, line);
+        List<String> end = this.findMatches(endSentencePattern, line);
+        List<String> sentences = this.findMatches(sentencePattern, line);
+        if (begin.size() == 0 && end.size() == 0 && sentences.size() == 0) {
+            unfinished.add(line);
+        } else {
+            unfinished.addAll(begin);
+            unfinished.addAll(end);
+            sentences.stream()
+                    .filter(this::isMatch)
+                    .forEach(x -> {
+                        try {
+                            this.storage.writeSentence(x);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
         }
-
-        for (String matched : findMatches(sentencePattern, line)) {
-            if (isMatch(matched)) {
-                this.storage.writeSentence(matched);
-            }
-        }
-
-        String[] end = findMatches(endSentencePattern, line);
-        if (end.length != 0) {
-            unfinishedSentence = end[0];
-        }
+        return unfinished.toArray(new String[0]);
     }
 
     /**
@@ -136,7 +130,10 @@ public class Resource implements Runnable {
      * @return true если содержится
      */
     private boolean isMatch(String sentence) {
-        return !Collections.disjoint(sentenceToWords(sentence), targetWords);
+        return !Collections.disjoint(
+                sentenceToWords(removeTrailingPunctuation(sentence)),
+                targetWords
+        );
     }
 
     /**
@@ -158,13 +155,13 @@ public class Resource implements Runnable {
      * @param content текст
      * @return массив совпадений
      */
-    private String[] findMatches(Pattern pattern, String content) {
+    private List<String> findMatches(Pattern pattern, String content) {
         List<String> matches = new LinkedList<>();
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             matches.add(matcher.group(0));
         }
-        return matches.toArray(new String[0]);
+        return matches;
     }
 
     /**

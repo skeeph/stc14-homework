@@ -100,6 +100,12 @@ public class Resource implements Runnable {
         System.out.println("SUCCESS: " + this.path + ". Time: " + elpsed / 1000000 + " ms.");
     }
 
+    /**
+     * Проверка предложений из строки с помощью стримов
+     *
+     * @param line строка для проверки
+     * @return Массив незаконченных частей предложения
+     */
     private String[] checkLine(String line) {
         List<String> unfinished = new LinkedList<>();
         List<String> begin = this.findMatches(beginSentencePattern, line);

@@ -3,15 +3,27 @@ package stc.khabib.lec08_chat.server;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Класс выполняющий авторизацию пользователя.
+ * Авторизация заключается в получении от пользователя его имени, и его добавлении
+ * в список авторизованных пользователей. Эта задача выполняется отдельным тред пулом
+ */
 public class UserLoginClass implements Runnable {
     Socket socket;
     Server server;
 
+    /**
+     * @param socket сокет-соединение с клиентом
+     * @param server сервер чата
+     */
     UserLoginClass(Socket socket, Server server) {
         this.socket = socket;
         this.server = server;
     }
 
+    /**
+     * Выполнение авторизации.
+     */
     @Override
     public void run() {
         try {

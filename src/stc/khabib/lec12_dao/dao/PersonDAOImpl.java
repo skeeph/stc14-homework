@@ -7,22 +7,48 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Реализация интерфейса управления студентами
+ */
+@SuppressWarnings("Duplicates")
 public class PersonDAOImpl implements PersonDAO {
+    /**
+     * Запрос для получения всех студентов
+     */
     private static final String GET_ALL_PERSONS_SQL_TEMPLATE =
             "SELECT * FROM person";
+
+    /**
+     * Шаблон запроса создания студента
+     */
     private static final String INSERT_PERSON_SQL_TEMPLATE =
             "INSERT INTO person(name, birthdate) VALUES (?,?)";
+    /**
+     * Шаблон запроса изменения студента
+     */
     private static final String UPDATE_PERSON_SQL_TEMPLATE =
             "UPDATE person set name=?, birthdate=? WHERE person_id=?;";
+    /**
+     * Шаблон запроса удаления студента
+     */
     private static final String DELETE_PERSON_SQL_TEMPLATE = "" +
             "DELETE FROM person WHERE person_id=?";
 
     private final Connection conn;
 
+    /**
+     * @param conn Коннектор к БД
+     */
     public PersonDAOImpl(Connection conn) {
         this.conn = conn;
     }
 
+    /**
+     * Получить список всех студентов
+     *
+     * @return список всех студентов
+     * @throws SQLException ошибка работы с БД
+     */
     @Override
     public Collection<Person> getAllPersons() throws SQLException {
         List<Person> result = new ArrayList<>();
@@ -39,6 +65,13 @@ public class PersonDAOImpl implements PersonDAO {
         return result;
     }
 
+
+    /**
+     * Сохранить предмет в БД
+     *
+     * @param person объект-студент
+     * @throws SQLException ошибка работы с БД
+     */
     @Override
     public void createPerson(Person person) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_PERSON_SQL_TEMPLATE)) {
@@ -48,6 +81,12 @@ public class PersonDAOImpl implements PersonDAO {
         }
     }
 
+    /**
+     * Изменить предмет в БД
+     *
+     * @param person объект-студент
+     * @throws SQLException ошибка работы с БД
+     */
     @Override
     public void updatePerson(Person person) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(UPDATE_PERSON_SQL_TEMPLATE)) {
@@ -58,6 +97,12 @@ public class PersonDAOImpl implements PersonDAO {
         }
     }
 
+    /**
+     * Удалить предмет из БД
+     *
+     * @param person объект-студент
+     * @throws SQLException ошибка работы с БД
+     */
     @Override
     public void deletePerson(Person person) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(DELETE_PERSON_SQL_TEMPLATE)) {

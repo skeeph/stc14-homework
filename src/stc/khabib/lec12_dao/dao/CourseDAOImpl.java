@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("Duplicates")
 public class CourseDAOImpl implements CourseDAO {
     private static final String LINK_PERSON_TO_SUBJECT_SQL_TEMPLATE =
             "INSERT INTO course(person_id, subject_id) VALUES (?,?);";
@@ -30,6 +30,13 @@ public class CourseDAOImpl implements CourseDAO {
         this.conn = conn;
     }
 
+    /**
+     * Получить список всех студентов, изучающих данный предмет
+     *
+     * @param subject предмет
+     * @return список студентов
+     * @throws SQLException ошибка работы с БД
+     */
     @Override
     public Collection<Person> getPersonsBySubject(Subject subject) throws SQLException {
         List<Person> result = new ArrayList<>();
@@ -47,6 +54,13 @@ public class CourseDAOImpl implements CourseDAO {
         return result;
     }
 
+    /**
+     * Получить список предметов, изучаемых данным студентом
+     *
+     * @param person студент
+     * @return список предметов
+     * @throws SQLException ошибка работы с БД
+     */
     @Override
     public Collection<Subject> getSubjectsByPerson(Person person) throws SQLException {
         List<Subject> result = new ArrayList<>();
@@ -63,10 +77,17 @@ public class CourseDAOImpl implements CourseDAO {
         return result;
     }
 
+    /**
+     * Записать данного студента, на несколько предметов
+     *
+     * @param person   студент
+     * @param subjects список предметов
+     * @throws SQLException ошибка работы с БД
+     */
     @Override
-    public void linkToCourse(Person person, Subject... subject) throws SQLException {
+    public void linkToCourse(Person person, Subject... subjects) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(LINK_PERSON_TO_SUBJECT_SQL_TEMPLATE)) {
-            for (Subject subj : subject) {
+            for (Subject subj : subjects) {
                 stmt.setInt(1, person.getId());
                 stmt.setInt(2, subj.getId());
                 stmt.addBatch();
@@ -75,10 +96,17 @@ public class CourseDAOImpl implements CourseDAO {
         }
     }
 
+    /**
+     * Записать на данный предмет нескольких студентов
+     *
+     * @param subject предмет
+     * @param persons список студентов
+     * @throws SQLException Ошибка работы с БД
+     */
     @Override
-    public void linkToCourse(Subject subject, Person... person) throws SQLException {
+    public void linkToCourse(Subject subject, Person... persons) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(LINK_PERSON_TO_SUBJECT_SQL_TEMPLATE)) {
-            for (Person p : person) {
+            for (Person p : persons) {
                 stmt.setInt(1, p.getId());
                 stmt.setInt(2, subject.getId());
                 stmt.addBatch();

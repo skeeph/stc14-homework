@@ -5,12 +5,39 @@ import stc.khabib.lec12_dao.entity.Person;
 import java.sql.SQLException;
 import java.util.Collection;
 
+/**
+ * Интерфейс для управления студентами
+ */
 public interface PersonDAO {
+    /**
+     * Получить список всех студентов
+     *
+     * @return список всех студентов
+     * @throws SQLException ошибка работы с БД
+     */
     Collection<Person> getAllPersons() throws SQLException;
 
-    void createPerson(Person Person) throws SQLException;
+    /**
+     * Сохранить предмет в БД
+     *
+     * @param person объект-студент
+     * @throws SQLException ошибка работы с БД
+     */
+    void createPerson(Person person) throws SQLException;
 
-    void updatePerson(Person Person) throws SQLException;
+    /**
+     * Изменить предмет в БД
+     *
+     * @param person объект-студент
+     * @throws SQLException ошибка работы с БД
+     */
+    void updatePerson(Person person) throws SQLException;
 
-    void deletePerson(Person Person) throws SQLException;
+    /**
+     * Удалить предмет из БД
+     *
+     * @param person объект-студент
+     * @throws SQLException ошибка работы с БД
+     */
+    void deletePerson(Person person) throws SQLException;
 }

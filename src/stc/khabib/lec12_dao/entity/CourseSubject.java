@@ -3,26 +3,39 @@ package stc.khabib.lec12_dao.entity;
 import java.util.Collection;
 import java.util.Objects;
 
+/**
+ * Предмет, с списком студентов, изучающих его
+ */
 public class CourseSubject {
     private Subject subject;
     private Collection<Person> students;
 
+    /**
+     * @return Предмет
+     */
     public Subject getSubject() {
         return subject;
     }
 
-    public CourseSubject setSubject(Subject subject) {
+    /**
+     * @param subject Предмет
+     */
+    public void setSubject(Subject subject) {
         this.subject = subject;
-        return this;
     }
 
+    /**
+     * @return Список студентов, изучающих предмет
+     */
     public Collection<Person> getStudents() {
         return students;
     }
 
-    public CourseSubject setStudents(Collection<Person> students) {
+    /**
+     * @param students Список студентов, изучающих предмет
+     */
+    public void setStudents(Collection<Person> students) {
         this.students = students;
-        return this;
     }
 
     @Override

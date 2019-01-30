@@ -1,9 +1,8 @@
 package stc.khabib.lec12_dao;
 
 
-import stc.khabib.lec12_dao.dao.CourseDAO;
-import stc.khabib.lec12_dao.dao.CourseDAOImpl;
 import stc.khabib.lec12_dao.dao.PersonDAO;
+import stc.khabib.lec12_dao.dao.PersonDAOImpl;
 import stc.khabib.lec12_dao.dao.SubjectDAO;
 import stc.khabib.lec12_dao.entity.Person;
 import stc.khabib.lec12_dao.entity.Subject;
@@ -19,24 +18,10 @@ public class Main {
         String pass = "polis";
 
         try (Connection conn = DriverManager.getConnection(url, login, pass)) {
-            CourseDAO dao = new CourseDAOImpl(conn);
-
-            Person snow = new Person();
-            snow.setId(3);
-
-            Person ned = new Person();
-            ned.setId(4);
-
-            Subject bastardBowl = new Subject();
-            bastardBowl.setId(6);
-
-            Subject gameOfThrones = new Subject();
-            gameOfThrones.setId(4);
-
-            System.out.println(dao.getSubjectsByPerson(snow));
+            PersonDAO dao = new PersonDAOImpl(conn);
+            createPersons(dao);
         }
 
-        // TODO В конце закрыть подключение
     }
 
     public static void createPersons(PersonDAO dao) throws SQLException {
@@ -46,26 +31,32 @@ public class Main {
         person.setBirthDate(System.currentTimeMillis());
         person.setName("John Snow Targarien");
         dao.createPerson(person);
+        System.out.println(person);
 
         Person ned = new Person("Ned Stark", System.currentTimeMillis() - 3600 * 1000 * 24);
         dao.createPerson(ned);
+        System.out.println(ned);
 
         Person cate = new Person("Catelyn Tully", System.currentTimeMillis() - 3600 * 1000 * 24 * 2);
         dao.createPerson(cate);
+        System.out.println(cate);
     }
 
     public static void createSubjects(SubjectDAO dao) throws SQLException {
         Subject subj = new Subject();
         subj.setDescription("Game of Thrones");
         dao.createSubject(subj);
+        System.out.println(subj);
 
         Subject subj2 = new Subject();
         subj2.setDescription("War of five kings");
         dao.createSubject(subj2);
+        System.out.println(subj2);
 
         Subject subj3 = new Subject();
         subj3.setDescription("Dance of the dragons");
         dao.createSubject(subj3);
+        System.out.println(subj3);
 
     }
 }

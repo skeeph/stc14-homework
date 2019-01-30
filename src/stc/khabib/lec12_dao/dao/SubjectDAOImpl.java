@@ -16,7 +16,7 @@ public class SubjectDAOImpl implements SubjectDAO {
      * Шаблон запроса создания предмета
      */
     private static final String INSERT_SUBJECT_SQL_TEMPLATE =
-            "INSERT INTO subject(description) VALUES (?)";
+            "INSERT INTO subject(description) VALUES (?) RETURNING subject_id;";
     /**
      * Шаблон запроса измененияпредмета
      */
@@ -72,7 +72,10 @@ public class SubjectDAOImpl implements SubjectDAO {
     public void createSubject(Subject subject) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SUBJECT_SQL_TEMPLATE)) {
             stmt.setString(1, subject.getDescription());
-            stmt.execute();
+            ResultSet res = stmt.executeQuery();
+            if (res.next()) {
+                subject.setId(res.getInt("subject_id"));
+            }
         }
     }
 

@@ -22,7 +22,7 @@ public class PersonDAOImpl implements PersonDAO {
      * Шаблон запроса создания студента
      */
     private static final String INSERT_PERSON_SQL_TEMPLATE =
-            "INSERT INTO person(name, birthdate) VALUES (?,?)";
+            "INSERT INTO person(name, birthdate) VALUES (?,?) RETURNING person_id;";
     /**
      * Шаблон запроса изменения студента
      */
@@ -77,7 +77,10 @@ public class PersonDAOImpl implements PersonDAO {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_PERSON_SQL_TEMPLATE)) {
             stmt.setString(1, person.getName());
             stmt.setDate(2, new Date(person.getBirthDate()));
-            stmt.execute();
+            ResultSet res = stmt.executeQuery();
+            if (res.next()) {
+                person.setId(res.getInt("person_id"));
+            }
         }
     }
 

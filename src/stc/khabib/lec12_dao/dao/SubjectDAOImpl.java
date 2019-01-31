@@ -1,5 +1,7 @@
 package stc.khabib.lec12_dao.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stc.khabib.lec12_dao.entity.Subject;
 
 import java.sql.*;
@@ -12,6 +14,7 @@ import java.util.List;
  */
 @SuppressWarnings("Duplicates")
 public class SubjectDAOImpl implements SubjectDAO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubjectDAOImpl.class);
     /**
      * Шаблон запроса создания предмета
      */
@@ -49,8 +52,10 @@ public class SubjectDAOImpl implements SubjectDAO {
      */
     @Override
     public Collection<Subject> getAllSubjects() throws SQLException {
+        LOGGER.debug("Получение списка предметов");
         List<Subject> result = new ArrayList<>();
         try (Statement st = conn.createStatement()) {
+            LOGGER.trace("subj list: {}", st);
             ResultSet res = st.executeQuery(GET_ALL_SUBJECTS_SQL_TEMPLATE);
             while (res.next()) {
                 Subject p = new Subject();
@@ -70,9 +75,11 @@ public class SubjectDAOImpl implements SubjectDAO {
      */
     @Override
     public void createSubject(Subject subject) throws SQLException {
+        LOGGER.debug("Создание предмета {}", subject);
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SUBJECT_SQL_TEMPLATE)) {
             stmt.setString(1, subject.getDescription());
             ResultSet res = stmt.executeQuery();
+            LOGGER.trace("subj create: {}", stmt);
             if (res.next()) {
                 subject.setId(res.getInt("subject_id"));
             }
@@ -87,9 +94,11 @@ public class SubjectDAOImpl implements SubjectDAO {
      */
     @Override
     public void updateSubject(Subject subject) throws SQLException {
+        LOGGER.debug("Изменени предмета {}", subject);
         try (PreparedStatement stmt = conn.prepareStatement(UPDATE_SUBJECT_SQL_TEMPLATE)) {
             stmt.setString(1, subject.getDescription());
             stmt.setInt(2, subject.getId());
+            LOGGER.trace("subj edit: {}", stmt);
             stmt.execute();
         }
     }
@@ -102,8 +111,10 @@ public class SubjectDAOImpl implements SubjectDAO {
      */
     @Override
     public void deleteSubject(Subject subject) throws SQLException {
+        LOGGER.debug("Удаление предмета {}", subject);
         try (PreparedStatement stmt = conn.prepareStatement(DELETE_SUBJECT_SQL_TEMPLATE)) {
             stmt.setInt(1, subject.getId());
+            LOGGER.trace("subj delete: {}", stmt);
             stmt.execute();
         }
     }

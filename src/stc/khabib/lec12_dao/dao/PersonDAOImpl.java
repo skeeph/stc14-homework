@@ -1,5 +1,7 @@
 package stc.khabib.lec12_dao.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import stc.khabib.lec12_dao.entity.Person;
 
 import java.sql.*;
@@ -12,6 +14,7 @@ import java.util.List;
  */
 @SuppressWarnings("Duplicates")
 public class PersonDAOImpl implements PersonDAO {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonDAOImpl.class);
     /**
      * Запрос для получения всех студентов
      */
@@ -51,8 +54,10 @@ public class PersonDAOImpl implements PersonDAO {
      */
     @Override
     public Collection<Person> getAllPersons() throws SQLException {
+        LOGGER.debug("Получение списка предметов");
         List<Person> result = new ArrayList<>();
         try (Statement st = conn.createStatement()) {
+            LOGGER.trace("users list {}", st);
             ResultSet res = st.executeQuery(GET_ALL_PERSONS_SQL_TEMPLATE);
             while (res.next()) {
                 Person p = new Person();
@@ -74,9 +79,11 @@ public class PersonDAOImpl implements PersonDAO {
      */
     @Override
     public void createPerson(Person person) throws SQLException {
+        LOGGER.debug("Создание пользователя {}", person);
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_PERSON_SQL_TEMPLATE)) {
             stmt.setString(1, person.getName());
             stmt.setDate(2, new Date(person.getBirthDate()));
+            LOGGER.trace("user creation, {}", stmt);
             ResultSet res = stmt.executeQuery();
             if (res.next()) {
                 person.setId(res.getInt("person_id"));
@@ -92,10 +99,12 @@ public class PersonDAOImpl implements PersonDAO {
      */
     @Override
     public void updatePerson(Person person) throws SQLException {
+        LOGGER.debug("Изменение пользователя {}", person);
         try (PreparedStatement stmt = conn.prepareStatement(UPDATE_PERSON_SQL_TEMPLATE)) {
             stmt.setString(1, person.getName());
             stmt.setDate(2, new Date(person.getBirthDate()));
             stmt.setInt(3, person.getId());
+            LOGGER.trace("user edit {}", stmt);
             stmt.execute();
         }
     }
@@ -108,8 +117,10 @@ public class PersonDAOImpl implements PersonDAO {
      */
     @Override
     public void deletePerson(Person person) throws SQLException {
+        LOGGER.debug("Удаление пользователя {}", person);
         try (PreparedStatement stmt = conn.prepareStatement(DELETE_PERSON_SQL_TEMPLATE)) {
             stmt.setInt(1, person.getId());
+            LOGGER.trace("user deletion {}", stmt);
             stmt.execute();
         }
     }

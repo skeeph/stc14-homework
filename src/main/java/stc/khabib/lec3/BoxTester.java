@@ -6,7 +6,6 @@ public class BoxTester {
         System.out.println(ob.hashCode());
         ob.addObject("string");
         ob.addObject(new BoxTester());
-        ObjectBox<Object> o1 = ob;
-        System.out.println(ob.equals(o1));
+        System.out.println(true);
     }
 }

@@ -37,6 +37,7 @@ public class Person {
 
     /**
      * Установка ID
+     *
      * @param id ID
      */
     public void setId(int id) {
@@ -52,6 +53,7 @@ public class Person {
 
     /**
      * Установка имени пользователя
+     *
      * @param name имя
      */
     public void setName(String name) {
@@ -67,6 +69,7 @@ public class Person {
 
     /**
      * Установка даты рождения
+     *
      * @param birthDate Дата рождения
      */
     public void setBirthDate(long birthDate) {

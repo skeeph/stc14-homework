@@ -4,7 +4,6 @@ import java.io.IOException;
 
 public class OccurenciesTest {
     public static void main(String[] args) throws IOException {
-        System.in.read();
         System.out.println("Start");
         Occurencies oc = new Occurencies(10);
         long startTime = System.nanoTime();
@@ -23,6 +22,5 @@ public class OccurenciesTest {
         );
         long elapsed = (System.nanoTime() - startTime) / 1000000;
         System.out.println("Elapsed time for all resources: " + elapsed + " ms.");
-        System.in.read();
     }
 }

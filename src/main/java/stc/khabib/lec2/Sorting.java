@@ -2,7 +2,7 @@ package stc.khabib.lec2;
 
 import java.util.Random;
 
-class Sorting {
+abstract class Sorting {
     /**
      * Функция генерирует массив случайных чисел заданной длинны
      *

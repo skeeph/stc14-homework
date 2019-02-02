@@ -20,6 +20,7 @@ public interface CourseDAO {
 
     /**
      * Получить список предметов, изучаемых данным студентом
+     *
      * @param person студент
      * @return список предметов
      * @throws SQLException ошибка работы с БД

@@ -22,7 +22,7 @@ public class ArrayProvider implements WordsProvider {
 
     /**
      * @param count число слов для генерации текста
-     * @return
+     * @return определенное число слов из массива
      */
     @Override
     public String[] getWords(int count) {

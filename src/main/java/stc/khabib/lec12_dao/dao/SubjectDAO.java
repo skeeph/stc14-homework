@@ -19,6 +19,7 @@ public interface SubjectDAO {
 
     /**
      * Сохранить предмет в БД
+     *
      * @param subject предмет
      * @throws SQLException ошибка работы с БД
      */
@@ -26,6 +27,7 @@ public interface SubjectDAO {
 
     /**
      * Изменить предмет в БД
+     *
      * @param subject предмет
      * @throws SQLException ошибка работы с БД
      */
@@ -33,6 +35,7 @@ public interface SubjectDAO {
 
     /**
      * Удалить предмет из БД
+     *
      * @param subject предмет
      * @throws SQLException ошибка работы с БД
      */

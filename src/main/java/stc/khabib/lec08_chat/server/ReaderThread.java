@@ -16,6 +16,7 @@ public class ReaderThread extends Thread {
 
     /**
      * конструктор
+     *
      * @param server Сервер
      */
     public ReaderThread(Server server) {

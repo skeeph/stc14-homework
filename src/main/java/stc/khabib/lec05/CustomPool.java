@@ -55,7 +55,7 @@ public class CustomPool {
      * Добавляет задачу в очередь пула
      *
      * @param r задача на выполнение
-     * @throws InterruptedException
+     * @throws InterruptedException остановка задач
      */
     public void submit(Runnable r) throws InterruptedException {
         if (!this.isThreadPoolShutDownInitiated) {
@@ -99,6 +99,7 @@ public class CustomPool {
                     r.run();
                 }
                 try {
+                    //TODO 02.02.19 skeeph: wait-notify
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

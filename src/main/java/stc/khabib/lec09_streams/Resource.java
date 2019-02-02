@@ -36,7 +36,6 @@ public class Resource implements Runnable {
     private final Pattern endSentencePattern = Pattern.compile(RE_END_SENTENCE);
     private final Pattern beginSentencePattern = Pattern.compile(RE_BEGIN_SENTENCE);
     private final Pattern sentencePattern = Pattern.compile(RE_SENTENCE, Pattern.MULTILINE);
-    private String unfinishedSentence = "";
 
     private Set<String> targetWords;
     private ResultStorage storage;

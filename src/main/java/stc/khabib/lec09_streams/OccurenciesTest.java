@@ -2,11 +2,9 @@ package stc.khabib.lec09_streams;
 
 import stc.khabib.lec05.GuttenberGenerator;
 
-import java.io.IOException;
-
 @SuppressWarnings("Duplicates")
 public class OccurenciesTest {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         System.out.println("Start");
         Occurencies oc = new Occurencies(10);
         long startTime = System.nanoTime();

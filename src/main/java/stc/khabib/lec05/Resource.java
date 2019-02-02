@@ -48,6 +48,8 @@ public class Resource implements Runnable {
         this.path = path;
     }
 
+    //TODO 02.02.19 skeeph: Перенести это в отдельный интерфейс
+
     /**
      * Открытие ресурса
      *

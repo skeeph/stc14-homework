@@ -35,6 +35,8 @@ public class Occurencies {
         this.threadPool = Executors.newFixedThreadPool(threadsCount);
     }
 
+    //TODO 02.02.19 skeeph: Переделать под лямбды
+
     /**
      * Основная функция.
      *

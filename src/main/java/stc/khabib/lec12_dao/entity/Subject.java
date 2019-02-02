@@ -41,6 +41,7 @@ public class Subject {
 
     /**
      * Сравнение предметов
+     *
      * @param o другой предмет
      * @return равенство
      */

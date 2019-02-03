@@ -47,6 +47,28 @@ class ResourceTest {
     }
 
     @Test
+    void parseNextLineFinished() throws IOException {
+        ResourceLoader rl = () -> new BufferedReader(new InputStreamReader(
+                new ByteArrayInputStream("Hello\nworld.".getBytes())
+        ));
+        Resource res = new Resource(rl, words, storage);
+        res.parseResource();
+        assertEquals(1, sentences.size());
+        assertEquals("Hello world.", sentences.get(0));
+    }
+
+    @Test
+    void multiLineSentences() throws IOException {
+        ResourceLoader rl = () -> new BufferedReader(new InputStreamReader(
+                new ByteArrayInputStream("Hello\nmultiline\nworld.".getBytes())
+        ));
+        Resource res = new Resource(rl, words, storage);
+        res.parseResource();
+        assertEquals(1, sentences.size());
+        assertEquals("Hello multiline world.", sentences.get(0));
+    }
+
+    @Test
     void testParseResourceException() {
         ResourceLoader rl = () -> {
             throw new IOException("mocked exception");

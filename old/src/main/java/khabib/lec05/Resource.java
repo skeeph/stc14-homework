@@ -81,7 +81,7 @@ public class Resource implements Runnable {
         if (!unfinishedSentence.equals("")) {
             String[] continuations = findMatches(beginSentencePattern, line);
             if (continuations.length == 0) {
-                unfinishedSentence += line;
+                unfinishedSentence = unfinishedSentence + " " + line;
                 return;
             }
 

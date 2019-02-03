@@ -2,6 +2,8 @@ package khabib.lec05;
 
 import khabib.lec05.loaders.ResourceLoader;
 import khabib.lec05.storage.ResultStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.util.regex.Pattern;
  * Класс реализует задачу поиска предложений в тексте.
  */
 public class Resource implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
     /**
      * Регулярка, выбирает часть неоконченного предложения с конца строки.
      */
@@ -35,7 +38,6 @@ public class Resource implements Runnable {
 
     private Set<String> targetWords;
     private ResultStorage storage;
-    private BufferedReader reader;
     private ResourceLoader loader;
 
     /**
@@ -57,22 +59,13 @@ public class Resource implements Runnable {
     public void parseResource() throws IOException {
         long startTime = System.nanoTime();
         try (BufferedReader r = loader.loadResource()) {
-            this.reader = r;
             String content;
-            int lineNum = 0;
-            while ((content = this.reader.readLine()) != null) {
+            while ((content = r.readLine()) != null) {
                 this.checkLine(content);
-                lineNum++;
-                if (lineNum % 100000 == 0) {
-                    System.err.println("====>" + loader + " " + lineNum);
-                }
             }
-        } finally {
-            this.reader.close();
-            this.reader = null;
         }
-        long elpsed = System.nanoTime() - startTime;
-        System.out.println("SUCCESS: " + loader + ". Time: " + elpsed / 1000000 + " ms.");
+        long elapsed = System.nanoTime() - startTime;
+        LOGGER.info("SUCCESS: {}. Time: {} ms.", loader, elapsed / 1000000);
     }
 
     /**

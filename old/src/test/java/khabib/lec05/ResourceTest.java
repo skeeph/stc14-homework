@@ -1,35 +1,26 @@
 package khabib.lec05;
 
 import khabib.lec05.loaders.ResourceLoader;
-import khabib.lec05.storage.ResultStorage;
+import khabib.lec05.utils.TestResultStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ResourceTest {
-    private List<String> sentences;
-    private ResultStorage storage;
+    private TestResultStorage storage;
     private ByteArrayOutputStream errStream;
     private Set<String> words;
 
     @BeforeEach
     void setUp() {
-        sentences = new ArrayList<>();
-        storage = new ResultStorage() {
-            @Override
-            public void writeSentence(String sentence) {
-                sentences.add(sentence);
-            }
-
-            @Override
-            public void close() {
-            }
-        };
+        storage = new TestResultStorage();
         errStream = new ByteArrayOutputStream();
         System.setErr(new PrintStream(errStream));
         words = new HashSet<>(Arrays.asList("hello", "meow"));
@@ -42,8 +33,8 @@ class ResourceTest {
         ));
         Resource res = new Resource(rl, words, storage);
         res.parseResource();
-        assertEquals(1, sentences.size());
-        assertEquals("Hello world.", sentences.get(0));
+        assertEquals(1, storage.getSentences().size());
+        assertEquals("Hello world.", storage.getSentences().get(0));
     }
 
     @Test
@@ -53,8 +44,8 @@ class ResourceTest {
         ));
         Resource res = new Resource(rl, words, storage);
         res.parseResource();
-        assertEquals(1, sentences.size());
-        assertEquals("Hello world.", sentences.get(0));
+        assertEquals(1, storage.getSentences().size());
+        assertEquals("Hello world.", storage.getSentences().get(0));
     }
 
     @Test
@@ -64,8 +55,8 @@ class ResourceTest {
         ));
         Resource res = new Resource(rl, words, storage);
         res.parseResource();
-        assertEquals(1, sentences.size());
-        assertEquals("Hello multiline world.", sentences.get(0));
+        assertEquals(1, storage.getSentences().size());
+        assertEquals("Hello multiline world.", storage.getSentences().get(0));
     }
 
     @Test
@@ -84,8 +75,8 @@ class ResourceTest {
         ));
         Resource res = new Resource(rl, words, storage);
         res.run();
-        assertEquals(1, sentences.size());
-        assertEquals("Hello world.", sentences.get(0));
+        assertEquals(1, storage.getSentences().size());
+        assertEquals("Hello world.", storage.getSentences().get(0));
     }
 
     @Test

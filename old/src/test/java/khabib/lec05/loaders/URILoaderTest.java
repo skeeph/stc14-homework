@@ -2,12 +2,12 @@ package khabib.lec05.loaders;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.rules.TemporaryFolder;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +41,18 @@ class URILoaderTest {
     void testToString() {
         ResourceLoader loader = new URILoader(url);
         assertEquals("Resource{" + url + "}", loader.toString());
+    }
+
+    @Test
+    void loadResourceFromFile() throws IOException {
+        TemporaryFolder tf = new TemporaryFolder();
+        tf.create();
+        File file = tf.newFile();
+        Files.write(Paths.get(file.toURI()), content.getBytes());
+        ResourceLoader rl = new URILoader(file.getAbsolutePath());
+        String read = rl.loadResource().lines().collect(Collectors.joining("\n"));
+        assertEquals(content, read);
+        tf.delete();
     }
 }
 

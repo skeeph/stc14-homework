@@ -1,13 +1,15 @@
 package khabib.lec05;
 
-import khabib.lec05.loaders.ResourceLoader;
 import khabib.lec05.storage.ResultStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,14 +40,14 @@ public class Resource implements Runnable {
 
     private Set<String> targetWords;
     private ResultStorage storage;
-    private ResourceLoader loader;
+    private Supplier<InputStream> loader;
 
     /**
      * @param loader      загрузчик ресурсов
      * @param targetWords Слова, которые нужно искать в предложениях
      * @param storage     хранилище результатов
      */
-    public Resource(ResourceLoader loader, Set<String> targetWords, ResultStorage storage) {
+    public Resource(Supplier<InputStream> loader, Set<String> targetWords, ResultStorage storage) {
         this.targetWords = targetWords;
         this.storage = storage;
         this.loader = loader;
@@ -58,7 +60,7 @@ public class Resource implements Runnable {
      */
     public void parseResource() throws IOException {
         long startTime = System.nanoTime();
-        try (BufferedReader r = loader.loadResource()) {
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(loader.get()))) {
             String content;
             while ((content = r.readLine()) != null) {
                 this.checkLine(content);
@@ -160,7 +162,7 @@ public class Resource implements Runnable {
     public void run() {
         try {
             this.parseResource();
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.printf("Ошибка парсинга ресурса %s: %s", loader, e);
         }
     }

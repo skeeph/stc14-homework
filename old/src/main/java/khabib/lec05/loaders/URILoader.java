@@ -1,15 +1,12 @@
 package khabib.lec05.loaders;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.function.Supplier;
 
 public class URILoader implements ResourceLoader {
-    private final String path;
-
-    public URILoader(String path) {
-        this.path = path;
-    }
-
     /**
      * Открытие ресурса
      *
@@ -17,14 +14,14 @@ public class URILoader implements ResourceLoader {
      * @throws IOException ошибка открытия
      */
     @Override
-    public BufferedReader loadResource() throws IOException {
+    public Supplier<InputStream> loadResource(String path) throws IOException {
         InputStream is;
         if (isURL(path)) {
             is = new URL(path).openStream();
         } else {
             is = new FileInputStream(path);
         }
-        return new BufferedReader(new InputStreamReader(is));
+        return () -> is;
     }
 
     /**
@@ -44,6 +41,6 @@ public class URILoader implements ResourceLoader {
 
     @Override
     public String toString() {
-        return "Resource{" + path + '}';
+        return "URILoader";
     }
 }

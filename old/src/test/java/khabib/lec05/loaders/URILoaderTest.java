@@ -9,6 +9,7 @@ import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -23,24 +24,28 @@ class URILoaderTest {
         URL.setURLStreamHandlerFactory(handler);
     }
 
+    private Stream<String> lines(InputStream is) {
+        return new BufferedReader(new InputStreamReader(is)).lines();
+    }
+
     @Test
     void testLoadResourceFromURL() throws IOException {
-        ResourceLoader rl = new URILoader(url);
-        BufferedReader reader = rl.loadResource();
-        String read = reader.lines().collect(Collectors.joining("\n"));
+        ResourceLoader rl = new URILoader();
+        InputStream is = rl.loadResource(url).get();
+        String read = lines(is).collect(Collectors.joining("\n"));
         assertEquals(content, read);
     }
 
     @Test
     void testLoadException() {
-        ResourceLoader rl = new URILoader(url + ".eof");
-        assertThrows(IOException.class, rl::loadResource);
+        ResourceLoader rl = new URILoader();
+        assertThrows(IOException.class, () -> rl.loadResource(url + ".eof"));
     }
 
     @Test
     void testToString() {
-        ResourceLoader loader = new URILoader(url);
-        assertEquals("Resource{" + url + "}", loader.toString());
+        ResourceLoader loader = new URILoader();
+        assertEquals("URILoader", loader.toString());
     }
 
     @Test
@@ -49,8 +54,8 @@ class URILoaderTest {
         tf.create();
         File file = tf.newFile();
         Files.write(Paths.get(file.toURI()), content.getBytes());
-        ResourceLoader rl = new URILoader(file.getAbsolutePath());
-        String read = rl.loadResource().lines().collect(Collectors.joining("\n"));
+        ResourceLoader rl = new URILoader();
+        String read = lines(rl.loadResource(file.getAbsolutePath()).get()).collect(Collectors.joining("\n"));
         assertEquals(content, read);
         tf.delete();
     }

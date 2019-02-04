@@ -1,6 +1,5 @@
 package khabib.lec05;
 
-import khabib.lec05.loaders.ResourceLoader;
 import khabib.lec05.utils.TestResultStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +8,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,9 +28,8 @@ class ResourceTest {
 
     @Test
     void parseResource() throws IOException {
-        ResourceLoader rl = () -> new BufferedReader(new InputStreamReader(
-                new ByteArrayInputStream("Hello world.".getBytes())
-        ));
+        Supplier<InputStream> rl = () -> new ByteArrayInputStream("Hello world.".getBytes());
+
         Resource res = new Resource(rl, words, storage);
         res.parseResource();
         assertEquals(1, storage.getSentences().size());
@@ -39,9 +38,7 @@ class ResourceTest {
 
     @Test
     void parseNextLineFinished() throws IOException {
-        ResourceLoader rl = () -> new BufferedReader(new InputStreamReader(
-                new ByteArrayInputStream("Hello\nworld.".getBytes())
-        ));
+        Supplier<InputStream> rl = () -> new ByteArrayInputStream("Hello\nworld.".getBytes());
         Resource res = new Resource(rl, words, storage);
         res.parseResource();
         assertEquals(1, storage.getSentences().size());
@@ -50,9 +47,8 @@ class ResourceTest {
 
     @Test
     void multiLineSentences() throws IOException {
-        ResourceLoader rl = () -> new BufferedReader(new InputStreamReader(
-                new ByteArrayInputStream("Hello\nmultiline\nworld.".getBytes())
-        ));
+        Supplier<InputStream> rl = () ->
+                new ByteArrayInputStream("Hello\nmultiline\nworld.".getBytes());
         Resource res = new Resource(rl, words, storage);
         res.parseResource();
         assertEquals(1, storage.getSentences().size());
@@ -61,18 +57,16 @@ class ResourceTest {
 
     @Test
     void testParseResourceException() {
-        ResourceLoader rl = () -> {
-            throw new IOException("mocked exception");
+        Supplier<InputStream> rl = () -> {
+            throw new RuntimeException("mocked exception");
         };
         Resource res = new Resource(rl, words, storage);
-        assertThrows(IOException.class, res::parseResource);
+        assertThrows(RuntimeException.class, res::parseResource);
     }
 
     @Test
     void testRun() {
-        ResourceLoader rl = () -> new BufferedReader(new InputStreamReader(
-                new ByteArrayInputStream("Hello world.".getBytes())
-        ));
+        Supplier<InputStream> rl = () -> new ByteArrayInputStream("Hello world.".getBytes());
         Resource res = new Resource(rl, words, storage);
         res.run();
         assertEquals(1, storage.getSentences().size());
@@ -81,13 +75,13 @@ class ResourceTest {
 
     @Test
     void testRunException() {
-        ResourceLoader rl = () -> {
-            throw new IOException("mocked exception");
+        Supplier<InputStream> rl = () -> {
+            throw new RuntimeException("mocked exception");
         };
         Resource res = new Resource(rl, words, storage);
         res.run();
         assertEquals(
-                String.format("Ошибка парсинга ресурса %s: java.io.IOException: mocked exception", rl),
+                String.format("Ошибка парсинга ресурса %s: java.lang.RuntimeException: mocked exception", rl),
                 errStream.toString()
         );
     }

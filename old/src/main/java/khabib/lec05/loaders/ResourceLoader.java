@@ -1,8 +1,10 @@
 package khabib.lec05.loaders;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.function.Supplier;
 
+@FunctionalInterface
 public interface ResourceLoader {
-    BufferedReader loadResource() throws IOException;
+    Supplier<InputStream> loadResource(String path) throws IOException;
 }

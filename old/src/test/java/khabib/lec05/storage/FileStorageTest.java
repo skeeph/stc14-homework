@@ -2,6 +2,7 @@ package khabib.lec05.storage;
 
 import org.junit.Rule;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnableRuleMigrationSupport
 class FileStorageTest {
     @Rule
     static TemporaryFolder tf = new TemporaryFolder();

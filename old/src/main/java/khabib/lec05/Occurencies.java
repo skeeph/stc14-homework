@@ -1,5 +1,6 @@
 package khabib.lec05;
 
+import khabib.lec05.loaders.URILoader;
 import khabib.lec05.storage.FileStorage;
 import khabib.lec05.storage.ResultStorage;
 
@@ -48,7 +49,7 @@ public class Occurencies {
 
         try (ResultStorage storage = new FileStorage(res)) {
             for (String source : sources) {
-                Runnable resource = new Resource(source, this.words, storage);
+                Runnable resource = new Resource(new URILoader(source), this.words, storage);
                 threadPool.submit(resource);
             }
             threadPool.shutdown();

@@ -2,7 +2,7 @@ package khabib.lec05;
 
 import java.io.IOException;
 
-public class OccurenciesTest {
+public class Main {
     public static void main(String[] args) throws IOException {
         System.out.println("Start");
         Occurencies oc = new Occurencies(10);

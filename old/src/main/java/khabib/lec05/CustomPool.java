@@ -23,32 +23,14 @@ public class CustomPool {
 
         for (int i = 0; i < numberOfThreads; i++) {
             Worker w = new Worker(this);
-            w.setName("Worker " + i);
+            w.setName("Worker-" + i);
             w.start();
             threads.add(w);
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        Runnable r = () -> {
-            try {
-                System.out.println(Thread.currentThread().getName() + " is executing task.");
-                Thread.sleep((long) (Math.random() * 1000));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        };
-
-        CustomPool p = new CustomPool(5);
-
-
-        for (int i = 0; i < 100; i++) {
-            p.submit(r);
-        }
-
-        p.shutdown();
-
-
+    public boolean isShutdown() {
+        return isThreadPoolShutDownInitiated && tasks.isEmpty();
     }
 
     /**
@@ -93,7 +75,7 @@ public class CustomPool {
          */
         @Override
         public void run() {
-            while (!threadPool.isThreadPoolShutDownInitiated || !this.threadPool.tasks.isEmpty()) {
+            while (!threadPool.isShutdown()) {
                 Runnable r;
                 while ((r = this.threadPool.tasks.poll()) != null) {
                     r.run();
@@ -101,8 +83,7 @@ public class CustomPool {
                 try {
                     //TODO 02.02.19 skeeph: wait-notify
                     Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException ignored) {
                 }
             }
         }

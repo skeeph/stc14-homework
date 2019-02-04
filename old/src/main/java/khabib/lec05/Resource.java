@@ -1,9 +1,12 @@
 package khabib.lec05;
 
+import khabib.lec05.loaders.ResourceLoader;
 import khabib.lec05.storage.ResultStorage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.net.URL;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +15,7 @@ import java.util.regex.Pattern;
  * Класс реализует задачу поиска предложений в тексте.
  */
 public class Resource implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
     /**
      * Регулярка, выбирает часть неоконченного предложения с конца строки.
      */
@@ -34,37 +38,17 @@ public class Resource implements Runnable {
 
     private Set<String> targetWords;
     private ResultStorage storage;
-    private BufferedReader reader;
-    private String path;
+    private ResourceLoader loader;
 
     /**
-     * @param path        Путь к ресурсу
+     * @param loader      загрузчик ресурсов
      * @param targetWords Слова, которые нужно искать в предложениях
      * @param storage     хранилище результатов
      */
-    public Resource(String path, Set<String> targetWords, ResultStorage storage) {
+    public Resource(ResourceLoader loader, Set<String> targetWords, ResultStorage storage) {
         this.targetWords = targetWords;
         this.storage = storage;
-        this.path = path;
-    }
-
-    //TODO 02.02.19 skeeph: Перенести это в отдельный интерфейс
-
-    /**
-     * Открытие ресурса
-     *
-     * @return объект для чтения из ресурса
-     * @throws IOException ошибка открытия
-     */
-    private BufferedReader openResource() throws IOException {
-        InputStream is;
-        if (isURL(path)) {
-            is = new URL(path).openStream();
-        } else {
-            is = new FileInputStream(path);
-        }
-        return new BufferedReader(new InputStreamReader(is));
-
+        this.loader = loader;
     }
 
     /**
@@ -74,23 +58,14 @@ public class Resource implements Runnable {
      */
     public void parseResource() throws IOException {
         long startTime = System.nanoTime();
-        try (BufferedReader r = this.openResource()) {
-            this.reader = r;
+        try (BufferedReader r = loader.loadResource()) {
             String content;
-            int lineNum = 0;
-            while ((content = this.reader.readLine()) != null) {
+            while ((content = r.readLine()) != null) {
                 this.checkLine(content);
-                lineNum++;
-                if (lineNum % 100000 == 0) {
-                    System.err.println("====>" + this.path + " " + lineNum);
-                }
             }
-        } finally {
-            this.reader.close();
-            this.reader = null;
         }
-        long elpsed = System.nanoTime() - startTime;
-        System.out.println("SUCCESS: " + this.path + ". Time: " + elpsed / 1000000 + " ms.");
+        long elapsed = System.nanoTime() - startTime;
+        LOGGER.info("SUCCESS: {}. Time: {} ms.", loader, elapsed / 1000000);
     }
 
     /**
@@ -106,7 +81,7 @@ public class Resource implements Runnable {
         if (!unfinishedSentence.equals("")) {
             String[] continuations = findMatches(beginSentencePattern, line);
             if (continuations.length == 0) {
-                unfinishedSentence += line;
+                unfinishedSentence = unfinishedSentence + " " + line;
                 return;
             }
 
@@ -179,21 +154,6 @@ public class Resource implements Runnable {
     }
 
     /**
-     * Функция проверяет является ли адрес ресурса путем к файлу или удаленному ресурсу
-     *
-     * @param url адрес
-     * @return true - если адрес удаленного ресурса
-     */
-    private boolean isURL(String url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
      * Запуск треда
      */
     @Override
@@ -201,7 +161,7 @@ public class Resource implements Runnable {
         try {
             this.parseResource();
         } catch (IOException e) {
-            System.err.printf("Ошибка парсинга ресурса %s: %s", this.path, e);
+            System.err.printf("Ошибка парсинга ресурса %s: %s", loader, e);
         }
     }
 }

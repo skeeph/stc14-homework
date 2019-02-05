@@ -18,10 +18,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class Occurencies {
     private static final long TIMEOUT = 3600;
-    Set<String> words;
-    ExecutorService threadPool;
-    private ResourceLoader loader;
-    private StorageFactory storageFactory;
+    private final ExecutorService threadPool;
+    private final ResourceLoader loader;
+    private final StorageFactory storageFactory;
 
     /**
      * Конструктор по умолчанию. Число потоков 5.
@@ -55,12 +54,11 @@ public class Occurencies {
      * @param res     адрес файла куда записывать найденные предложения
      */
     public void getOccurencies(String[] sources, String[] words, String res) {
-        this.words = new HashSet<>();
-        this.words.addAll(Arrays.asList(words));
+        Set<String> wordSet = new HashSet<>(Arrays.asList(words));
 
         try (ResultStorage storage = this.storageFactory.getStorage(res)) {
             for (String source : sources) {
-                Runnable resource = new Resource(this.loader.loadResource(source), this.words, storage);
+                Runnable resource = new Resource(this.loader.loadResource(source), wordSet, storage);
                 threadPool.submit(resource);
             }
             threadPool.shutdown();

@@ -1,8 +1,9 @@
 package khabib.lec05.loaders;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.function.Supplier;
 
@@ -16,27 +17,24 @@ public class URILoader implements ResourceLoader {
     @Override
     public Supplier<InputStream> loadResource(String path) throws IOException {
         InputStream is;
-        if (isURL(path)) {
-            is = new URL(path).openStream();
-        } else {
-            is = new FileInputStream(path);
-        }
+        is = toURL(path).openStream();
         return () -> is;
     }
 
     /**
      * Функция проверяет является ли адрес ресурса путем к файлу или удаленному ресурсу
      *
-     * @param url адрес
-     * @return true - если адрес удаленного ресурса
+     * @param path адрес
+     * @return URL к ресурсу
      */
-    private boolean isURL(String url) {
+    private URL toURL(String path) throws IOException {
+        URL url;
         try {
-            new URL(url);
-            return true;
-        } catch (Exception e) {
-            return false;
+            url = new URL(path);
+        } catch (MalformedURLException e) {
+            url = new File(path).toURI().toURL();
         }
+        return url;
     }
 
     @Override

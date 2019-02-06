@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * Класс реализует задачу поиска предложений в тексте.
  */
 @SuppressWarnings("Duplicates")
-public class Resource implements Runnable {
+public class Resource {
     /**
      * Регулярка, выбирает часть неоконченного предложения с конца строки.
      */
@@ -71,15 +71,14 @@ public class Resource implements Runnable {
 
     /**
      * Парсинг ресурса и поиск подходящих предлоежний
-     *
-     * @throws IOException Ошибка чтения
      */
-    public void parseResource() throws IOException {
+    public void parseResource() {
         long startTime = System.nanoTime();
         try (Stream<String> r = this.openResourceStream()) {
             Stream<String> collected = r.map(String::trim)
                     .map(this::checkLine)
                     .flatMap(Arrays::stream);
+            //noinspection ResultOfMethodCallIgnored
             collected.reduce("", (a, b) -> {
                 String c = (a + " " + b).trim();
                 if (sentencePattern.matcher(c).matches()) {
@@ -87,16 +86,21 @@ public class Resource implements Runnable {
                         try {
                             this.storage.writeSentence(c);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            System.err.println("Ошибка во время записи результата: " + e);
                         }
                     }
                     return "";
                 }
                 return c;
             });
+        } catch (Exception e) {
+            System.err.println(
+                    String.format("Произошла ошибка обработки ресурса %s: %s", this, e)
+            );
+        } finally {
+            long elapsed = (System.nanoTime() - startTime) / 1000000;
+            System.out.println("SUCCESS: " + this.path + ". Time: " + elapsed + " ms.");
         }
-        long elpsed = System.nanoTime() - startTime;
-        System.out.println("SUCCESS: " + this.path + ". Time: " + elpsed / 1000000 + " ms.");
     }
 
     /**
@@ -191,18 +195,6 @@ public class Resource implements Runnable {
             return true;
         } catch (Exception e) {
             return false;
-        }
-    }
-
-    /**
-     * Запуск треда
-     */
-    @Override
-    public void run() {
-        try {
-            this.parseResource();
-        } catch (IOException e) {
-            System.err.printf("Ошибка парсинга ресурса %s: %s", this.path, e);
         }
     }
 }

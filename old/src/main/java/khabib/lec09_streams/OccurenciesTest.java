@@ -6,19 +6,11 @@ import khabib.lec05.GuttenberGenerator;
 public class OccurenciesTest {
     public static void main(String[] args) {
         System.out.println("Start");
-        Occurencies oc = new Occurencies(10);
+        Occurencies oc = new Occurencies();
         long startTime = System.nanoTime();
         oc.getOccurencies(
-//                new String[]{
-//                        "./generated/0.txt",
-//                        "https://www.ietf.org/rfc/rfc2616.txt",
-//                        "./generated/war.txt",
-//                        "./generated/lib.txt",
-//                        "./generated/guttenberg.txt",
-//                        "./generated/gut.txt",
-//                },
                 GuttenberGenerator.getResources(10),
-                new String[]{"эртугрул", "текфур", "canonical", "age", "марию", "павловна", "participation", "bedford"},
+                new String[]{"participation", "bedford"},
                 "found.txt"
         );
         long elapsed = (System.nanoTime() - startTime) / 1000000;

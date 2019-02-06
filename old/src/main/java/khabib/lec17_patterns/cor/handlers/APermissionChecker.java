@@ -12,10 +12,9 @@ public abstract class APermissionChecker implements PermissionChecker {
         }
     }
 
-    protected boolean checkNext(Operation w) {
+    protected void checkNext(Operation w) throws OperationError {
         if (next != null) {
-            return this.next.check(w);
+            this.next.check(w);
         }
-        return true;
     }
 }

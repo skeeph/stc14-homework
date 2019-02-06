@@ -6,8 +6,7 @@ import khabib.lec17_patterns.cor.entities.Withdrawal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Тест проверяет корректную работу реализации паттерна
@@ -27,9 +26,17 @@ public class CoRTest {
 
     @Test
     void testCoR() {
-        assertFalse(p.check(new Withdrawal(client, 1235, 100)));
-        assertFalse(p.check(new Withdrawal(client, 1234, 200)));
-        assertFalse(p.check(new Operation(client, 1234)));
-        assertTrue(p.check(new Withdrawal(client, 1234, 50)));
+        Throwable e = assertThrows(OperationError.class,
+                () -> p.check(new Withdrawal(client, 1235, 100)));
+        assertEquals("Invalid PIN code", e.getMessage());
+
+        e = assertThrows(OperationError.class,
+                () -> p.check(new Withdrawal(client, 1234, 200)));
+        assertEquals("Сумма операции превосходит баланс пользователя", e.getMessage());
+
+        e = assertThrows(OperationError.class,
+                () -> p.check(new Operation(client, 1234)));
+        assertEquals("Неверный тип операции: " + Operation.class.getSimpleName(), e.getMessage());
+        assertDoesNotThrow(() -> p.check(new Withdrawal(client, 1234, 50)));
     }
 }

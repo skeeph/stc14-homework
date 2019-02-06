@@ -3,6 +3,6 @@ package khabib.lec17_patterns.cor.handlers;
 import khabib.lec17_patterns.cor.entities.Operation;
 
 public interface PermissionChecker {
-    boolean check(Operation o);
+    void check(Operation o) throws OperationError;
     void setNext(PermissionChecker checker);
 }

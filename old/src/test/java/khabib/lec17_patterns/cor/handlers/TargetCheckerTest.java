@@ -5,8 +5,8 @@ import khabib.lec17_patterns.cor.entities.Transfer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TargetCheckerTest extends CheckersTest {
 
@@ -17,10 +17,15 @@ class TargetCheckerTest extends CheckersTest {
 
     @Test
     void check() {
-        assertTrue(checker.check(new Transfer(client, 1000, 1000, "4111 1111 1111 1111")));
-        assertTrue(checker.check(new Transfer(client, 1000, 1000, "4111111111111111")));
-        assertFalse(checker.check(new Transfer(client, 100, 1000, "456464")));
-        assertFalse(checker.check(new Transfer(client, 100, 1000, "some target id")));
-        assertFalse(checker.check(new Operation(client, 100)));
+        assertDoesNotThrow(() -> checker.check(
+                new Transfer(client, 1, 1, "4111 1111 1111 1111")));
+        assertDoesNotThrow(() -> checker.check(
+                new Transfer(client, 1, 1, "4111111111111111")));
+        assertThrows(OperationError.class,
+                () -> checker.check(new Transfer(client, 100, 1000, "456464")));
+        assertThrows(OperationError.class,
+                () -> checker.check(new Transfer(client, 100, 1000, "some target id")));
+        assertThrows(OperationError.class,
+                () -> checker.check(new Operation(client, 100)));
     }
 }

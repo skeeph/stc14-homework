@@ -4,11 +4,12 @@ import khabib.lec17_patterns.cor.entities.Operation;
 
 public class PINChecker extends APermissionChecker {
     @Override
-    public boolean check(Operation o) {
+    public void check(Operation o) throws OperationError {
         if (o.getPinCode() == o.getClient().getPinCode()) {
-            return checkNext(o);
+            checkNext(o);
+            return;
         }
-        return false;
+        throw new OperationError("Invalid PIN code");
     }
 
 }

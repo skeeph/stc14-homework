@@ -6,11 +6,15 @@ import khabib.lec17_patterns.cor.entities.Transfer;
 public class TargetChecker extends APermissionChecker {
 
     @Override
-    public boolean check(Operation o) {
+    public void check(Operation o) throws OperationError {
         if (!(o instanceof Transfer)) {
-            return false;
+            throw new OperationError("Неверный тип операции: " + o.getClass().getSimpleName());
         }
         Transfer t = (Transfer) o;
-        return t.getTarget().matches("(\\d{4}\\s*){4}");
+        if (t.getTarget().matches("(\\d{4}\\s*){4}")) {
+            checkNext(o);
+            return;
+        }
+        throw new OperationError("Неверный формат счета получателя");
     }
 }

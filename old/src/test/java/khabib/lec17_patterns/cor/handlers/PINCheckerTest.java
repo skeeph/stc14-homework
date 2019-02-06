@@ -4,8 +4,8 @@ import khabib.lec17_patterns.cor.entities.Operation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Тест для задачи проверки PIN кода
@@ -23,7 +23,7 @@ class PINCheckerTest extends CheckersTest {
      */
     @Test
     void check() {
-        assertTrue(checker.check(new Operation(client, 1234)));
-        assertFalse(checker.check(new Operation(client, 1235)));
+        assertDoesNotThrow(() -> checker.check(new Operation(client, 1234)));
+        assertThrows(OperationError.class, () -> checker.check(new Operation(client, 1235)));
     }
 }

@@ -5,14 +5,15 @@ import khabib.lec17_patterns.cor.entities.Withdrawal;
 
 public class BalanceChecker extends APermissionChecker {
     @Override
-    public boolean check(Operation o) {
+    public void check(Operation o) throws OperationError {
         if (!(o instanceof Withdrawal)) {
-            return false;
+            throw new OperationError("Неверный тип операции: " + o.getClass().getSimpleName());
         }
         Withdrawal w = (Withdrawal) o;
         if (w.getClient().getBalance() >= w.getAmount()) {
-            return checkNext(w);
+            checkNext(w);
+            return;
         }
-        return false;
+        throw new OperationError("Сумма операции превосходит баланс пользователя");
     }
 }

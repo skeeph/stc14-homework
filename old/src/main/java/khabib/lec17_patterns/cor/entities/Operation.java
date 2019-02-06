@@ -1,10 +1,10 @@
 package khabib.lec17_patterns.cor.entities;
 
-public abstract class Operation {
+public class Operation {
     protected Client client;
     private int pinCode;
 
-    protected Operation(int pinCode, Client client) {
+    public Operation(Client client, int pinCode) {
         this.pinCode = pinCode;
         this.client = client;
     }

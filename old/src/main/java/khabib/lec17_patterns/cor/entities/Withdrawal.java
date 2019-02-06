@@ -4,7 +4,7 @@ public class Withdrawal extends Operation {
     private double amount;
 
     public Withdrawal(Client client, int pinCode, double amount) {
-        super(pinCode, client);
+        super(client, pinCode);
         this.amount = amount;
     }
 

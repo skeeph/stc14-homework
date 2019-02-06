@@ -6,9 +6,9 @@ import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
 import khabib.lec17_patterns.cor.handlers.*;
 
 public class ATM {
-    private final PermissionChecker PINChecker;
-    private final PermissionChecker WithdrawChecker;
-    private final PermissionChecker TransferChecker;
+    private final IPermissionChecker PINChecker;
+    private final IPermissionChecker WithdrawChecker;
+    private final IPermissionChecker TransferChecker;
 
     public ATM() {
         PINChecker = new PINChecker();

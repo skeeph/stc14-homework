@@ -4,7 +4,6 @@ import khabib.lec17_patterns.cor.entities.operations.Operation;
 import khabib.lec17_patterns.cor.entities.operations.Transfer;
 
 public class TargetChecker extends APermissionChecker {
-
     @Override
     public void check(Operation o) throws OperationError {
         if (!(o instanceof Transfer)) {

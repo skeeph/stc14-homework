@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * все же решил добавить его
  */
 public class CoRTest {
-    private PermissionChecker p;
+    private IPermissionChecker p;
     private Client client;
 
     @BeforeEach

@@ -1,4 +1,6 @@
-package khabib.lec17_patterns.cor.entities;
+package khabib.lec17_patterns.cor.entities.operations;
+
+import khabib.lec17_patterns.cor.entities.Client;
 
 public class Transfer extends Withdrawal {
     private final String target;

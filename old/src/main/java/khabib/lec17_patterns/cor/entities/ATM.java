@@ -1,5 +1,8 @@
 package khabib.lec17_patterns.cor.entities;
 
+import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.Transfer;
+import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
 import khabib.lec17_patterns.cor.handlers.*;
 
 public class ATM {

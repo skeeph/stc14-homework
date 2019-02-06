@@ -1,8 +1,8 @@
 package khabib.lec17_patterns.cor.handlers;
 
 import khabib.lec17_patterns.cor.entities.Client;
-import khabib.lec17_patterns.cor.entities.Operation;
-import khabib.lec17_patterns.cor.entities.Withdrawal;
+import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

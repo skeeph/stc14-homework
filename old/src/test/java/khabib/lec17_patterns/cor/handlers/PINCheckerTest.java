@@ -1,6 +1,6 @@
 package khabib.lec17_patterns.cor.handlers;
 
-import khabib.lec17_patterns.cor.entities.Operation;
+import khabib.lec17_patterns.cor.entities.operations.Operation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

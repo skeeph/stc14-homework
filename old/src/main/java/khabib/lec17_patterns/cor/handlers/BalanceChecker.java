@@ -1,7 +1,7 @@
 package khabib.lec17_patterns.cor.handlers;
 
-import khabib.lec17_patterns.cor.entities.Operation;
-import khabib.lec17_patterns.cor.entities.Withdrawal;
+import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
 
 public class BalanceChecker extends APermissionChecker {
     @Override

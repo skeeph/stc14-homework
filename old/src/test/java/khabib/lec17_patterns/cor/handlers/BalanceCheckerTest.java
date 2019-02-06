@@ -1,6 +1,5 @@
 package khabib.lec17_patterns.cor.handlers;
 
-import khabib.lec17_patterns.cor.entities.Client;
 import khabib.lec17_patterns.cor.entities.Operation;
 import khabib.lec17_patterns.cor.entities.Withdrawal;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Проверка баланса
  */
-class BalanceCheckerTest {
-    private BalanceChecker checker;
-    private Client client;
+class BalanceCheckerTest extends CheckersTest {
 
+    @Override
     @BeforeEach
     void setUp() {
+        super.setUp();
         checker = new BalanceChecker();
-        client = new Client(1234, 100);
     }
 
     /**

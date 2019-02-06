@@ -1,0 +1,21 @@
+package khabib.lec17_patterns.cor.handlers;
+
+import khabib.lec17_patterns.cor.entities.Withdrawal;
+
+public abstract class APermissionChecker implements PermissionChecker {
+    protected PermissionChecker next;
+
+    @Override
+    public void setNext(PermissionChecker checker) {
+        if (next == null) {
+            next = checker;
+        }
+    }
+
+    protected boolean checkNext(Withdrawal w) {
+        if (next != null) {
+            return this.next.check(w);
+        }
+        return true;
+    }
+}

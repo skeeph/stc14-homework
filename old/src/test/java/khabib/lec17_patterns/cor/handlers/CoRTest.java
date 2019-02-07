@@ -1,7 +1,7 @@
 package khabib.lec17_patterns.cor.handlers;
 
 import khabib.lec17_patterns.cor.entities.Client;
-import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.PINRequired;
 import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,8 +35,8 @@ public class CoRTest {
         assertEquals("Сумма операции превосходит баланс пользователя", e.getMessage());
 
         e = assertThrows(OperationError.class,
-                () -> p.check(new Operation(client, 1234)));
-        assertEquals("Неверный тип операции: " + Operation.class.getSimpleName(), e.getMessage());
+                () -> p.check(new PINRequired(client, 1234)));
+        assertEquals("Неверный тип операции: " + PINRequired.class.getSimpleName(), e.getMessage());
         assertDoesNotThrow(() -> p.check(new Withdrawal(client, 1234, 50)));
     }
 }

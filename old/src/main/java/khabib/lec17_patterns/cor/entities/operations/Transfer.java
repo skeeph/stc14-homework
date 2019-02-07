@@ -16,11 +16,14 @@ public class Transfer extends Withdrawal {
     }
 
     @Override
-    public IPermissionChecker getPermissionChecker() {
-        if (permissionChecker == null) {
-            permissionChecker = new PINChecker()
-                    .setNext(new BalanceChecker().setNext(new TargetChecker()));
-        }
+    protected void createPermissionChecker() {
+        permissionChecker = new PINChecker().setNext(
+                new BalanceChecker().setNext(new TargetChecker())
+        );
+    }
+
+    @Override
+    protected IPermissionChecker getPermCheck() {
         return permissionChecker;
     }
 

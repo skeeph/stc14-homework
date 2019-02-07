@@ -5,9 +5,10 @@ import khabib.lec17_patterns.cor.handlers.BalanceChecker;
 import khabib.lec17_patterns.cor.handlers.IPermissionChecker;
 import khabib.lec17_patterns.cor.handlers.PINChecker;
 
-public class Withdrawal extends Operation {
-    private double amount;
+public class Withdrawal extends PINRequired {
     private static IPermissionChecker permissionChecker;
+    private double amount;
+
     public Withdrawal(Client client, int pinCode, double amount) {
         super(client, pinCode);
         this.amount = amount;
@@ -25,10 +26,12 @@ public class Withdrawal extends Operation {
     }
 
     @Override
-    public IPermissionChecker getPermissionChecker() {
-        if (permissionChecker == null) {
-            permissionChecker = new PINChecker().setNext(new BalanceChecker());
-        }
+    protected void createPermissionChecker() {
+        permissionChecker = new PINChecker().setNext(new BalanceChecker());
+    }
+
+    @Override
+    protected IPermissionChecker getPermCheck() {
         return permissionChecker;
     }
 }

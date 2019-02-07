@@ -1,6 +1,6 @@
 package khabib.lec17_patterns.cor.entities;
 
-import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.PINRequired;
 import khabib.lec17_patterns.cor.entities.operations.Transfer;
 import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
 import khabib.lec17_patterns.cor.handlers.OperationError;
@@ -21,7 +21,7 @@ public class ATM {
     }
 
     public void changePin(Client client, int pin, int newPin) throws OperationError {
-        Operation o = new Operation(client, pin);
+        PINRequired o = new PINRequired(client, pin);
         o.getPermissionChecker().check(o);
         client.setPinCode(newPin);
         System.out.println("Установка нового кода: " + newPin);

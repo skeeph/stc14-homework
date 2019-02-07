@@ -1,6 +1,6 @@
 package khabib.lec17_patterns.cor.handlers;
 
-import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.PINRequired;
 import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class BalanceCheckerTest extends CheckersTest {
     void check() {
         assertThrows(OperationError.class,
                 () -> checker.check(
-                        new Operation(client, 1235)));
+                        new PINRequired(client, 1235)));
         assertThrows(OperationError.class,
                 () -> checker.check(
                         new Withdrawal(client, 1234, 200)));

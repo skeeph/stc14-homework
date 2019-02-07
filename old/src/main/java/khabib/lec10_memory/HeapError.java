@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Класс вызывает переполнение кучи.
+ */
 public class HeapError {
     private static final int LOOP_COUNT = 100_000_000;
 

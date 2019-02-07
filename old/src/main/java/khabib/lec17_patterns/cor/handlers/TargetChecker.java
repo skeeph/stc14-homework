@@ -3,6 +3,9 @@ package khabib.lec17_patterns.cor.handlers;
 import khabib.lec17_patterns.cor.entities.operations.Operation;
 import khabib.lec17_patterns.cor.entities.operations.Transfer;
 
+/**
+ * Проверка корректности введенного счета получателя
+ */
 public class TargetChecker extends APermissionChecker {
     @Override
     public void check(Operation o) throws OperationError {

@@ -13,12 +13,4 @@ public interface IPermissionChecker {
      * @throws OperationError ошибка возникающаяа при отсутствии прав
      */
     void check(Operation o) throws OperationError;
-
-    /**
-     * Установка следующей проверки в цепи
-     *
-     * @param checker следующая проверка
-     * @return полученный результат
-     */
-    IPermissionChecker setNext(IPermissionChecker checker);
 }

@@ -41,7 +41,7 @@ public class Withdrawal extends PINRequired {
      */
     @Override
     protected void createPermissionChecker() {
-        permissionChecker = new PINChecker().setNext(new BalanceChecker());
+        permissionChecker = new PINChecker(new BalanceChecker());
     }
 
     /**

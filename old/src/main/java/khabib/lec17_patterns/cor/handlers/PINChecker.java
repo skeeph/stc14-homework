@@ -6,6 +6,13 @@ import khabib.lec17_patterns.cor.entities.operations.Operation;
  * Класс проверяет введенный пин код
  */
 public class PINChecker extends APermissionChecker {
+    public PINChecker() {
+    }
+
+    public PINChecker(IPermissionChecker next) {
+        this.setNext(next);
+    }
+
     /**
      * сравнивает введенный пин код с актуальным кодом клиента
      *

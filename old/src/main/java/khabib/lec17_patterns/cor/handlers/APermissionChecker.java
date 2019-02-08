@@ -10,14 +10,11 @@ public abstract class APermissionChecker implements IPermissionChecker {
      * Установка следующей проверки в цепи
      *
      * @param checker следующая проверка
-     * @return полученный результат
      */
-    @Override
-    public IPermissionChecker setNext(IPermissionChecker checker) {
+    protected void setNext(IPermissionChecker checker) {
         if (next == null) {
             next = checker;
         }
-        return this;
     }
 
     /**

@@ -29,9 +29,7 @@ public class Transfer extends Withdrawal {
      */
     @Override
     protected void createPermissionChecker() {
-        permissionChecker = new PINChecker().setNext(
-                new BalanceChecker().setNext(new TargetChecker())
-        );
+        permissionChecker = new PINChecker(new BalanceChecker(new TargetChecker()));
     }
 
     /**

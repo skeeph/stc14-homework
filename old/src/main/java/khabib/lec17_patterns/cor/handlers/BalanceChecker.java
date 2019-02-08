@@ -7,6 +7,13 @@ import khabib.lec17_patterns.cor.entities.operations.Withdrawal;
  * Класс проверяющий баланс пользователя
  */
 public class BalanceChecker extends APermissionChecker {
+    public BalanceChecker() {
+    }
+
+    public BalanceChecker(IPermissionChecker next) {
+        this.setNext(next);
+    }
+
     /**
      * Проверяет достаточно ли средств у клиента для выполнения операции
      *

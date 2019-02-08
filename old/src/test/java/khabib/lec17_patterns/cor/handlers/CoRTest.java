@@ -19,8 +19,7 @@ public class CoRTest {
 
     @BeforeEach
     void setUp() {
-        p = new PINChecker();
-        p.setNext(new BalanceChecker());
+        p = new PINChecker(new BalanceChecker());
         client = new Client(1234, 100);
     }
 

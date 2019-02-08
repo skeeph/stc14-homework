@@ -8,6 +8,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Класс вызывает переполнение постоянной памяти
+ * Для этого используется InMemoryCompiler(Седьмое домашнее задание)
+ * в цикле производится генерирование новых классов, создание  сохранение их объектов
+ */
 @SuppressWarnings("Duplicates")
 public class MetaSpaceError {
     private static final int LOOP_COUNT = 100_000_000;

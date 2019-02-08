@@ -20,11 +20,17 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * Проверка загрузчика ресурсов
+ */
 class URILoaderTest {
     public static final String content = "test\nload";
     private static final String url = "http://some.url/path/file.txt";
     private static URLConnection mockedConnection;
 
+    /**
+     * Выполняется один раз, перед запуском всех тестов
+     */
     @BeforeAll
     static void setUpAll() {
         URLStreamHandler mockedHandler = new URLStreamHandler() {
@@ -36,15 +42,29 @@ class URILoaderTest {
         URL.setURLStreamHandlerFactory((protocol) -> protocol.equals("file") ? null : mockedHandler);
     }
 
+    /**
+     * Выполняется перед каждым тестом
+     */
     @BeforeEach
     void setUp() {
         mockedConnection = Mockito.mock(HttpURLConnection.class);
     }
 
+    /**
+     * Построчто читает все содержимое InputStream'а в стрим строк
+     *
+     * @param is ресурс для чтения
+     * @return стрим из строк входного ресурса
+     */
     private Stream<String> lines(InputStream is) {
         return new BufferedReader(new InputStreamReader(is)).lines();
     }
 
+    /**
+     * Проверка загрузки файлов по URL адресу
+     *
+     * @throws IOException Ошибка работы с ресурсами
+     */
     @Test
     void testLoadResourceFromURL() throws IOException {
         Mockito
@@ -57,6 +77,11 @@ class URILoaderTest {
         assertEquals(content, read);
     }
 
+    /**
+     * Негативный тест загрузки ресурсов
+     *
+     * @throws IOException Ошибка работы с ресурсами
+     */
     @Test
     void testLoadException() throws IOException {
         Mockito
@@ -66,12 +91,20 @@ class URILoaderTest {
         assertThrows(IOException.class, () -> rl.loadResource(url));
     }
 
+    /**
+     * Проверка строкового представления
+     */
     @Test
     void testToString() {
         ResourceLoader loader = new URILoader();
         assertEquals("URILoader", loader.toString());
     }
 
+    /**
+     * Проверка чтения ресурсов из файлов
+     *
+     * @throws IOException Ошибка работы с файлами
+     */
     @Test
     void loadResourceFromFile() throws IOException {
         TemporaryFolder tf = new TemporaryFolder();

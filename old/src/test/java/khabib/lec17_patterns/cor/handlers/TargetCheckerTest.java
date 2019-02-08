@@ -1,6 +1,6 @@
 package khabib.lec17_patterns.cor.handlers;
 
-import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.PINRequired;
 import khabib.lec17_patterns.cor.entities.operations.Transfer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +26,6 @@ class TargetCheckerTest extends CheckersTest {
         assertThrows(OperationError.class,
                 () -> checker.check(new Transfer(client, 100, 1000, "some target id")));
         assertThrows(OperationError.class,
-                () -> checker.check(new Operation(client, 100)));
+                () -> checker.check(new PINRequired(client, 100)));
     }
 }

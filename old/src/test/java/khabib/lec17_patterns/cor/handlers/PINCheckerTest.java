@@ -1,6 +1,6 @@
 package khabib.lec17_patterns.cor.handlers;
 
-import khabib.lec17_patterns.cor.entities.operations.Operation;
+import khabib.lec17_patterns.cor.entities.operations.PINRequired;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,9 @@ class PINCheckerTest extends CheckersTest {
      */
     @Test
     void check() {
-        assertDoesNotThrow(() -> checker.check(new Operation(client, 1234)));
-        assertThrows(OperationError.class, () -> checker.check(new Operation(client, 1235)));
+        assertDoesNotThrow(() -> checker.check(new PINRequired(client, 1234)));
+        assertThrows(OperationError.class, () -> checker.check(
+                new PINRequired(client, 1235)
+        ));
     }
 }

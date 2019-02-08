@@ -4,7 +4,7 @@ import khabib.lec17_patterns.cor.entities.Client;
 import org.junit.jupiter.api.BeforeEach;
 
 public abstract class CheckersTest {
-    protected PermissionChecker checker;
+    protected IPermissionChecker checker;
     protected Client client;
 
     @BeforeEach

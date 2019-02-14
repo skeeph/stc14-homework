@@ -1,6 +1,6 @@
-package khabib.lec23;
+package khabib.lec23_injections;
 
-import khabib.lec23.api.Uploader;
+import khabib.lec23_injections.api.Uploader;
 
 public class DBUploader implements Uploader {
     @Override

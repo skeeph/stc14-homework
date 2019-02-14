@@ -1,7 +1,9 @@
-package khabib.lec23;
+package khabib.lec23_injections;
 
-import khabib.lec23.api.Downloader;
+import khabib.lec23_injections.api.Downloader;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DBDownloader implements Downloader {
     @Override
     public Object download(String path) {

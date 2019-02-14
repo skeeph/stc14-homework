@@ -1,6 +1,6 @@
-package khabib.lec23;
+package khabib.lec23_injections;
 
-import khabib.lec23.api.Downloader;
+import khabib.lec23_injections.api.Downloader;
 
 public class FileDownloader implements Downloader {
     @Override

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataHandler" class="khabib.lec23_injections.DataHandler" autowire="byName">
+        <!--Связываyие через конструктор
+        <constructor-arg name="downloader" ref="downloader"/>
+        <constructor-arg name="uploader" ref="uploader"/>
+        -->
+
+        <!-- Связывание через сеттеры
+        <property name="downloader">
+            <bean class="khabib.lec23_injections.FileDownloader"/>
+        </property>
+
+        <property name="uploader">
+            <bean class="khabib.lec23_injections.FileUploader"/>
+        </property>
+        -->
+
+
+    </bean>
+
+    <bean name="downloader" class="khabib.lec23_injections.FileDownloader"/>
+    <bean name="uploader" class="khabib.lec23_injections.FileUploader"/>
+</beans>
